@@ -82,62 +82,37 @@ h2{font:700 12px var(--ui);letter-spacing:.2em;color:var(--mute);margin:34px 0 1
 .skin:disabled{cursor:default;color:var(--mute)}
 .skin:disabled i{background:repeating-linear-gradient(45deg,#1b1e2b 0 6px,#121420 6px 12px)}
 
-#play{position:fixed;inset:0;display:flex;flex-direction:column;gap:8px;padding-block:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-bottom));padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
-#play.hurt{animation:hurt .36s}
-@keyframes hurt{30%{box-shadow:inset 0 0 0 6px var(--pink),inset 0 0 90px #ff3d7f88;transform:translateX(-6px)}60%{transform:translateX(5px)}}
-.hud{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(120px,1.1fr) auto;align-items:center;gap:12px;flex:none}
-.lvname small{display:block;font:700 11px var(--ui);letter-spacing:.16em;color:var(--mute)}
-.lvname b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.php{display:flex;align-items:center;gap:8px;min-width:0}
-.php small{font:700 11px var(--ui);letter-spacing:.14em;color:var(--mute)}
-.php .meter{flex:1;height:10px;min-width:50px}
-.php .meter i{background:var(--gold)}
-.php b{font:400 15px var(--display);font-variant-numeric:tabular-nums;white-space:nowrap}
-.scorebox{justify-self:end;display:flex;align-items:center;gap:10px;text-align:right}
-.scorebox b{display:block;font:400 clamp(18px,3vw,28px)/1 var(--display);font-variant-numeric:tabular-nums}
-.scorebox small{font:700 11px var(--ui);letter-spacing:.12em;color:var(--mute)}
-.mult{font:400 18px/1 var(--display);padding:7px 9px;border-radius:8px;background:var(--line);color:var(--mute)}
-.mult.m2{background:#3ee0ff26;color:var(--cyan)}
-.mult.m3{background:var(--cyan);color:#03141b}
-.mult.m4{background:var(--pink);color:#fff;animation:throb .5s ease-in-out infinite alternate}
-.mult.pop{animation:pop .3s}
-@keyframes throb{to{transform:scale(1.12)}}
-@keyframes pop{40%{transform:scale(1.5)}}
-#coach{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--cyan);border-radius:10px;padding:8px 14px;flex:none;min-height:44px;display:flex;align-items:center}
-#coach p{margin:0;font-size:clamp(14px,1.9vw,18px);line-height:1.3}
-#coach small{font:700 11px var(--ui);letter-spacing:.16em;color:var(--cyan);margin-right:10px}
-#coach.new{border-left-color:var(--gold)}#coach.new small{color:var(--gold)}
-#coach.miss{border-left-color:var(--pink)}#coach.miss small{color:var(--pink)}
-.arena{flex:1;min-height:0;display:flex;gap:8px}
-.foe{flex:0 0 clamp(110px,22vw,230px);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:0;border-radius:12px;background:radial-gradient(circle at 50% 42%,#1c2142,transparent 70%)}
-.sprite{width:min(78%,24vh);aspect-ratio:1;filter:drop-shadow(-3px 0 #ff3d7fa0) drop-shadow(3px 0 #3ee0ffa0);animation:hover 2.4s ease-in-out infinite}
+#play{position:fixed;inset:0;display:flex;flex-direction:column;gap:10px;padding-block:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-bottom));padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
+#play.hurt{animation:hurt .4s}
+@keyframes hurt{30%{box-shadow:inset 0 0 0 4px var(--pink),inset 0 0 60px #ff3d7f55}}
+.hud{display:flex;align-items:center;gap:14px;flex:none}
+.hud .icon{width:34px;height:34px;font-size:14px;opacity:.6}
+.foe{flex:1;min-width:0;display:flex;align-items:center;gap:10px}
+.sprite{width:30px;flex:none;aspect-ratio:1;filter:drop-shadow(-2px 0 #ff3d7fa0) drop-shadow(2px 0 #3ee0ffa0)}
 .sprite.boss{aspect-ratio:16/18}
 .sprite svg{width:100%;height:100%;display:block}
-@keyframes hover{50%{transform:translateY(-6px)}}
-.sprite.hit{animation:hit .26s}
-@keyframes hit{0%{filter:brightness(4)}30%{transform:translateX(-9px)}65%{transform:translateX(7px)}}
-.sprite.lunge{animation:lunge .5s}
-@keyframes lunge{45%{transform:scale(1.3) translateY(8px);filter:drop-shadow(0 0 18px var(--pink))}}
-.sprite.dead{animation:dead .85s forwards}
-@keyframes dead{30%{filter:brightness(4)}100%{opacity:0;transform:scaleY(.05) translateY(40px);filter:blur(6px)}}
-.foename{font:400 clamp(11px,1.6vw,15px)/1.1 var(--display);text-align:center}
-.foehp{width:86%;height:8px}
-.foehp i{background:linear-gradient(90deg,var(--pink),#ff8fb1)}
-.dmg{position:absolute;left:50%;top:26%;font:400 clamp(22px,4vw,42px)/1 var(--display);pointer-events:none;text-shadow:0 3px 0 #000;animation:dmg .8s ease-out forwards}
-@keyframes dmg{from{transform:translate(-50%,0) scale(1.5)}to{transform:translate(-50%,-56px);opacity:0}}
-.chart{flex:1;min-width:0;position:relative;background:var(--chart);border-radius:12px;overflow:hidden;transition:box-shadow .3s}
+.sprite.hit{animation:hit .22s}
+@keyframes hit{0%{filter:brightness(4)}50%{transform:translateX(-3px)}}
+.sprite.lunge{animation:lunge .4s}
+@keyframes lunge{45%{transform:scale(1.5);filter:drop-shadow(0 0 10px var(--pink))}}
+.sprite.dead{animation:dead .7s forwards}
+@keyframes dead{30%{filter:brightness(4)}100%{opacity:0;transform:scaleY(.1)}}
+.hbar{flex:1;min-width:0;display:grid;gap:4px}
+.hbar small{font:700 10px var(--ui);letter-spacing:.14em;color:var(--mute);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud .meter{height:6px}
+.foehp i{background:var(--pink)}
+.php{flex:0 1 30%;text-align:right}
+.php .meter i{background:var(--gold)}
+.chart{flex:1;min-height:90px;position:relative;background:var(--chart);border-radius:14px;overflow:hidden}
 .chart svg{position:absolute;inset:0;width:100%;height:100%;display:block}
-.chart.m2{box-shadow:0 0 22px #3ee0ff55}.chart.m3{box-shadow:0 0 34px #3ee0ff99}.chart.m4{box-shadow:0 0 44px #ff3d7fbb}
 .mus{font-family:"Noto Music","Apple Symbols","Segoe UI Symbol","Noto Sans Symbols 2",serif}
 .nlab{font:700 15px var(--ui)}
-.nt{animation:notein .14s ease-out}
-@keyframes notein{from{opacity:0;transform:translateX(30px)}}
-.fuse{position:absolute;left:0;right:0;bottom:0;height:8px;background:#dfe3ec}
-.fuse i{display:block;height:100%;width:100%;background:var(--cyan)}
-.fuse.second i{background:var(--pink)}
-.judge{position:absolute;top:10px;right:12px;font:400 clamp(16px,2.6vw,26px)/1 var(--display);background:#07080de6;padding:8px 12px;border-radius:8px;pointer-events:none;opacity:0}
-.judge.on{animation:judge .7s ease-out}
-@keyframes judge{0%{opacity:0;transform:translateY(8px) scale(.9)}15%{opacity:1;transform:none}70%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+.nt{animation:notein .16s ease-out;transform-box:fill-box;transform-origin:center}
+@keyframes notein{from{opacity:0;transform:scale(.8)}}
+.shake{animation:shake .3s;transform-box:fill-box;transform-origin:center}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.tip{flex:none;min-height:2.7em;margin:0;display:grid;place-items:center;text-align:center;font-size:clamp(15px,2vw,19px);line-height:1.3;color:var(--mute)}
+.tip.new{color:var(--gold)}.tip.miss{color:#ff8fb1}
 .overlay{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:8px;background:#07080de0;font:400 clamp(24px,4.6vw,52px)/1.05 var(--display);text-align:center;padding:12px}
 .overlay small{font:700 13px var(--ui);letter-spacing:.18em;color:var(--mute)}
 .overlay p{font:500 clamp(15px,2vw,19px)/1.4 var(--ui);max-width:34em;margin:0;color:var(--ink)}
@@ -231,15 +206,11 @@ dialog button{border:1px solid var(--line);background:var(--bg);border-radius:10
 <section id="play" hidden>
   <header class="hud">
     <button class="icon" id="quit" aria-label="Run away">✕</button>
-    <div class="lvname"><small id="hudKind"></small><b id="hudName"></b></div>
-    <div class="php"><small class="kid"></small><div class="meter"><i id="hpFill"></i></div><b id="hpTxt"></b></div>
-    <div class="scorebox"><div><b id="score">0</b><small id="comboN"></small></div><span class="mult" id="mult">×1</span></div>
+    <div class="foe"><div class="sprite" id="sprite"></div><div class="hbar"><small id="foeName"></small><div class="meter foehp"><i id="foeHp"></i></div></div></div>
+    <div class="hbar php"><small class="kid"></small><div class="meter"><i id="hpFill"></i></div></div>
   </header>
-  <div id="coach"><p><small id="coachKind"></small><span id="coachText"></span></p></div>
-  <div class="arena">
-    <div class="foe" id="foe"><div class="sprite" id="sprite"></div><div class="foename" id="foeName"></div><div class="meter foehp"><i id="foeHp"></i></div></div>
-    <div class="chart" id="chart"><div id="staff"></div><div class="fuse" id="fuseBox"><i id="fuse"></i></div><div class="judge" id="judge"></div><div class="overlay" id="overlay" hidden></div></div>
-  </div>
+  <div class="chart" id="chart"><div id="staff"></div><div class="overlay" id="overlay" hidden></div></div>
+  <p class="tip" id="tip" aria-live="polite"></p>
   <div class="bells" id="bells"><div class="kit" id="kit"></div></div>
   <div class="rotate">TURN IT SIDEWAYS ↻<small>All 32 bars need the wide screen.</small></div>
 </section>
@@ -460,8 +431,7 @@ function explain(t, m) {
   const d = t.step - h.step, n = Math.abs(d), s = n > 1 ? 's' : '';
   return `You hit ${h.name}. This note is ${n} step${s} ${d > 0 ? 'higher' : 'lower'} on the staff, so ${n} letter${s} to the ${d > 0 ? 'right' : 'left'}.`;
 }
-const COACH = { new: 'NEW NOTE', battle: 'READ', miss: 'WHY' };
-function coach(text, kind) { $('#coach').className = kind; $('#coachKind').textContent = COACH[kind]; $('#coachText').textContent = text; }
+function tip(text = '', kind = '') { const t = $('#tip'); t.textContent = text; t.className = `tip ${kind}`; }
 
 /* ---------- staff: one note at a time ---------- */
 const S = 14, TOP = 3 * S, BOT = TOP + 4 * S, H = BOT + 5 * S, SW = 300, NX = 180;
@@ -481,10 +451,10 @@ function ledgers(x, step, color, op = 1) {
 }
 const accSVG = (x, n, color) => `<text class="mus" x="${x - S * .64 - 9}" y="${yOf(n.step) + (n.acc < 0 ? .3 : .5) * S}" font-size="${2 * S}" text-anchor="middle" fill="${color}">${sym(n)}</text>`;
 const head = (x, y, attrs) => `<ellipse cx="${x}" cy="${y}" rx="${S * .64}" ry="${S * .46}" transform="rotate(-20 ${x} ${y})" ${attrs}/>`;
-function noteSVG(x, n, lab) {
+function noteSVG(x, n, lab, color = INK) {
   const y = yOf(n.step), up = n.step < 4, sx = up ? x + S * .64 - .8 : x - S * .64 + .8;
-  return ledgers(x, n.step, INK) + (n.acc ? accSVG(x, n, INK) : '') + head(x, y, `fill="${INK}"`)
-    + `<line x1="${sx}" x2="${sx}" y1="${y}" y2="${up ? y - 3.4 * S : y + 3.4 * S}" stroke="${INK}" stroke-width="1.8"/>`
+  return ledgers(x, n.step, INK) + (n.acc ? accSVG(x, n, color) : '') + head(x, y, `fill="${color}"`)
+    + `<line x1="${sx}" x2="${sx}" y1="${y}" y2="${up ? y - 3.4 * S : y + 3.4 * S}" stroke="${color}" stroke-width="1.8"/>`
     + (lab ? `<text class="nlab" x="${x}" y="${H - 5}" text-anchor="middle" fill="${lab[1]}">${lab[0]}</text>` : '');
 }
 const ghostSVG = (x, h) => ledgers(x, h.step, RED, .5) + (h.acc ? accSVG(x + 3, h, RED) : '') + head(x + 3, yOf(h.step), `fill="none" stroke="${RED}" stroke-width="2" stroke-dasharray="3 2"`);
@@ -493,12 +463,14 @@ function labelFor(n) {
   const lv = n.isNew ? 0 : mastery(st.m[n.key]);
   return lv <= 1 ? [n.name, '#2b3350'] : lv === 2 ? [n.name, '#c3c8d3'] : null;
 }
-function renderNote(r, fresh) {
-  const n = r.n, tag = n.isNew ? ['NEW', '#c99700'] : n.again ? ['AGAIN', RED] : null;
+const RING = S * 1.9, CIRC = 2 * Math.PI * RING;
+function renderNote(r, { fresh, shake, color } = {}) {
+  const n = r.n, y = yOf(n.step), tag = n.isNew ? ['NEW', '#c99700'] : n.again ? ['AGAIN', RED] : null;
   let g = staffBase();
   if (tag) g += `<text class="nlab" x="${SW - 10}" y="20" text-anchor="end" fill="${tag[1]}">${tag[0]}</text>`;
   if (n.wrong !== undefined) g += ghostSVG(NX, spellLike(n.wrong, n));
-  g += `<g${fresh ? ' class="nt"' : ''}>${noteSVG(NX, n, labelFor(n))}</g>`;
+  g += `<g class="${fresh ? 'nt' : shake ? 'shake' : ''}">${noteSVG(NX, n, labelFor(n), color)}</g>`;
+  g += `<circle id="ring" cx="${NX}" cy="${y}" r="${RING}" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="${CIRC}" transform="rotate(-90 ${NX} ${y})" opacity="0"/>`;
   $('#staff').innerHTML = wrap(g);
 }
 
@@ -568,11 +540,9 @@ async function startLevel(k, retry = []) {
   const r = run = { k, L, pool: poolOf(L), read: L.read[0], hp: CONFIG.maxHp, hpLost: 0, kills: 0, notes: 0, hits: 0, crits: 0, times: [], combo: 0, best: 0, score: 0,
     phase: 'intro', turn: 0, tok: 0, queue: retry.map((n, i) => ({ n, due: i * 2 })), missed: [], lastMidi: null, n: null, masteredBefore: masteredSet() };
   show('play');
-  $('#hudName').textContent = L.name;
-  $('#play').classList.remove('hurt'); $('#judge').classList.remove('on'); glowWant(-1);
+  $('#play').classList.remove('hurt'); glowWant(-1); tip();
   setFoe(r, 0); hud();
-  $('#staff').innerHTML = wrap(staffBase()); $('#fuse').style.width = '100%';
-  coach(retry.length ? 'The notes you missed last time come first.' : L.brief, 'new');
+  $('#staff').innerHTML = wrap(staffBase());
   await tapOverlay(`${r.foe.name}<p>${retry.length ? `Rematch. Your ${retry.length} missed note${retry.length > 1 ? 's come' : ' comes'} first.` : L.brief}</p><small>TAP TO FIGHT ▶</small>`);
   if (run === r) nextNote(r);
 }
@@ -583,20 +553,24 @@ function nextNote(r) {
   const n = r.n = { ...base, again: qi >= 0, isNew: !st.seen[base.key] && !st.m[base.key], tries: 0, wrong: undefined };
   r.phase = 'read';
   startFuse(r, n.isNew ? Infinity : r.read);
-  if (n.isNew) { glowWant(n.midi); coach(`${n.name} sits ${where(n)}${n.acc ? `, with a ${sym(n)}` : ''}. On the bells: ${barWhere(n)}. Hit the glowing bar.`, 'new'); }
-  renderNote(r, true); hud();
+  if (n.isNew) { glowWant(n.midi); tip(`New note: ${n.name} sits ${where(n)}${n.acc ? `, with a ${sym(n)}` : ''}. On the bells: ${barWhere(n)}.`, 'new'); }
+  else tip();
+  renderNote(r, { fresh: true });
 }
 function startFuse(r, limit) {
   const tok = ++r.tok;
   r.limit = limit; r.t0 = r.lastFrame = performance.now();
-  $('#fuseBox').classList.toggle('second', r.phase === 'second');
   const loop = () => {
     if (run !== r || r.tok !== tok) return;
     const now = performance.now(), gap = now - r.lastFrame;
     r.lastFrame = now;
     if (gap > 250 || rotated()) r.t0 += gap; // hidden tab, stall or portrait: hold the clock
-    const left = r.limit - (now - r.t0) / 1000;
-    $('#fuse').style.width = `${isFinite(left) ? Math.max(0, left / r.limit) * 100 : 100}%`;
+    const left = r.limit - (now - r.t0) / 1000, f = isFinite(left) ? Math.max(0, left / r.limit) : 1, ring = $('#ring');
+    if (ring) { // the ring shows only when time runs low, or during the second chance
+      ring.setAttribute('stroke', r.phase === 'second' ? RED : '#0aa5c2');
+      ring.setAttribute('opacity', r.phase === 'second' || f < .6 ? .8 : 0);
+      ring.setAttribute('stroke-dashoffset', CIRC * (1 - f));
+    }
     if (left <= 0) return timeUp(r);
     requestAnimationFrame(loop);
   };
@@ -613,46 +587,41 @@ function press(midi, ts = performance.now()) {
   }
   if (midi === n.midi) return correct(r, ts);
   n.wrong = midi; flash(BARS[midi], 'bad', 260); setTimeout(buzz, 30);
-  if (n.isNew) { coach(`${explain(n, midi)} Hit the glowing bar.`, 'miss'); return renderNote(r); }
+  if (n.isNew) { tip(`${explain(n, midi)} Hit the glowing bar.`, 'miss'); return renderNote(r, { shake: true }); }
   r.phase === 'read' ? firstMiss(r, explain(n, midi)) : reveal(r);
 }
 function correct(r, ts) {
   const n = r.n, b = BARS[n.midi], rt = Math.max(0, (ts - r.t0) / 1000);
   r.tok++; glowWant(-1); flash(b, 'ok', 200);
-  let dmg, label, color;
-  if (n.isNew) {
-    st.seen[n.key] = 1; [dmg, label, color] = [5, 'LEARNED', 'var(--gold)'];
-    coach(`${n.name}: ${where(n)}. Now it is in the fight.`, 'battle');
-  } else if (r.phase === 'second') {
-    [dmg, label, color] = [3, 'RECOVERED', 'var(--mute)'];
-    coach(`Yes, ${n.name}: ${where(n)}. It comes back soon.`, 'battle');
-  } else {
+  let dmg, color = '#0aa5c2';
+  if (n.isNew) { st.seen[n.key] = 1; dmg = 5; }
+  else if (r.phase === 'second') { dmg = 3; color = '#8b90a0'; }
+  else {
     record(n.key, 1); r.hits++; r.notes++; r.times.push(rt);
-    let k; [label, k, color] = rt < 1 ? ['CRIT', 2, 'var(--gold)'] : rt < 2 ? ['GREAT', 1.5, 'var(--cyan)'] : ['GOOD', 1, 'var(--ink)'];
-    const before = mult(r.combo);
-    r.combo++; r.best = Math.max(r.best, r.combo); if (label === 'CRIT') r.crits++;
-    if (mult(r.combo) > before) { setTimeout(() => flash($('#mult'), 'pop', 300)); chord([77, 81, 84], .08, .12); }
-    if (r.combo % 5 === 0) { r.hp = Math.min(CONFIG.maxHp, r.hp + 2); label += ' +2 HP'; }
+    const k = rt < 1 ? 2 : rt < 2 ? 1.5 : 1, before = mult(r.combo);
+    if (rt < 1) { r.crits++; color = '#c99700'; }
+    r.combo++; r.best = Math.max(r.best, r.combo);
+    if (mult(r.combo) > before) chord([77, 81, 84], .08, .12);
+    if (r.combo % 5 === 0) r.hp = Math.min(CONFIG.maxHp, r.hp + 2);
     r.read = adapt(r.read, true, r.L.read);
     dmg = Math.round(10 * k * mult(r.combo) * (st.noLabels ? 1.5 : 1));
-    coach(`${n.name} · ${where(n)} · ${rt.toFixed(1)}s`, 'battle');
   }
-  r.score += dmg; judge(label, color); sparks(b, color);
-  r.phase = 'next'; hud();
-  if (!hurtFoe(r, dmg, color)) setTimeout(() => nextNote(r), 170);
+  r.score += dmg; sparks(b, color); tip();
+  r.phase = 'next'; hud(); renderNote(r, { color });
+  if (!hurtFoe(r, dmg)) setTimeout(() => nextNote(r), 200);
 }
-function firstMiss(r, tip) {
+function firstMiss(r, why) {
   const n = r.n;
   r.tok++; record(n.key, 0); r.notes++; r.combo = 0;
   r.read = adapt(r.read, false, r.L.read);
   r.queue.push({ n: { ...n }, due: r.turn + 3 });
   if (!r.missed.some(x => x.key === n.key)) r.missed.push({ ...n });
   r.hp = Math.max(0, r.hp - r.foe.atk); r.hpLost += r.foe.atk;
-  flash($('#sprite'), 'lunge', 500); flash($('#play'), 'hurt', 360); thud(); judge(`MISS −${r.foe.atk} HP`, 'var(--pink)'); hud();
+  flash($('#sprite'), 'lunge', 400); flash($('#play'), 'hurt', 400); thud(); hud();
   if (r.hp <= 0) return finish(r, false);
   r.phase = 'second'; n.tries = 1;
-  coach(`${tip} Second chance!`, 'miss');
-  renderNote(r); startFuse(r, CONFIG.secondChance);
+  tip(`${why} One more try.`, 'miss');
+  renderNote(r, { shake: true }); startFuse(r, CONFIG.secondChance);
 }
 function timeUp(r) {
   if (r.phase === 'read') return firstMiss(r, `Time! It sits ${where(r.n)}.`);
@@ -661,42 +630,30 @@ function timeUp(r) {
 function reveal(r) {
   const n = r.n;
   r.tok++; r.phase = 'reveal'; n.tries = 2;
-  glowWant(n.midi); renderNote(r); bell(n.midi, .2, .2); $('#fuse').style.width = '0%';
-  coach(`It was ${n.name}: ${where(n)}. On the bells: ${barWhere(n)}. Hit it to go on.`, 'miss');
+  glowWant(n.midi); renderNote(r, { shake: true }); bell(n.midi, .2, .2);
+  tip(`It was ${n.name}: ${where(n)}. On the bells: ${barWhere(n)}. Hit it to go on.`, 'miss');
 }
-function hurtFoe(r, dmg, color) {
+function hurtFoe(r, dmg) {
   const f = r.foe; f.hp = Math.max(0, f.hp - dmg); foeBar();
-  flash($('#sprite'), 'hit', 260);
-  const d = document.createElement('div'); d.className = 'dmg'; d.textContent = dmg; d.style.color = color;
-  $('#foe').append(d); setTimeout(() => d.remove(), 800);
+  flash($('#sprite'), 'hit', 220);
   if (f.hp > 0) return false;
   foeDown(r);
   return true;
 }
 async function foeDown(r) {
   r.phase = 'down';
-  $('#sprite').className = `sprite${r.foe.crown ? ' boss' : ''} dead`; judge('DEFEATED', 'var(--gold)'); chord([70, 74, 77, 82, 86], .1, .2);
-  await sleep(950); if (run !== r) return;
+  $('#sprite').className = `sprite${r.foe.crown ? ' boss' : ''} dead`; chord([70, 74, 77, 82, 86], .1, .2);
+  await tapOverlay(`${r.foe.name}<small>DEFEATED</small>`, 1000); if (run !== r) return;
   if (r.L !== ENDLESS) return finish(r, true);
   r.kills++; r.hp = Math.min(CONFIG.maxHp, r.hp + 5);
   setFoe(r, r.kills); hud();
   await tapOverlay(`${r.foe.name}<small>NEXT UP</small>`, 1300);
   nextNote(r);
 }
-function hud() {
-  const r = run, m = mult(r.combo);
-  $('#hudKind').textContent = `${r.k < LEVELS.length ? `LEVEL ${r.k + 1}` : 'GAUNTLET'} · ${r.read.toFixed(1)}s TO READ`;
-  $('#score').textContent = fmt(r.score);
-  $('#comboN').textContent = r.combo >= 2 ? `${r.combo} STREAK` : '';
-  $('#mult').textContent = `×${m}`; $('#mult').className = `mult m${m}`;
-  $('#chart').className = `chart m${m}`;
-  $('#hpFill').style.width = `${r.hp / CONFIG.maxHp * 100}%`;
-  $('#hpTxt').textContent = `${r.hp}/${CONFIG.maxHp}`;
-}
-function judge(text, color) { const j = $('#judge'); j.textContent = text; j.style.color = color; j.classList.remove('on'); void j.offsetWidth; j.classList.add('on'); }
+const hud = () => { $('#hpFill').style.width = `${run.hp / CONFIG.maxHp * 100}%`; };
 async function finish(r, won) {
   r.phase = 'over'; r.tok++; glowWant(-1);
-  if (!won) { judge('DOWN', 'var(--pink)'); await sleep(900); }
+  if (!won) await tapOverlay(`DOWN<small>${r.foe.name} WINS THIS ONE</small>`, 1000);
   if (run !== r) return;
   showResults(settle(r, won));
 }
