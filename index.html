@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Overtone">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#07080d">
+<title>Overtone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Chakra+Petch:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Music&text=%F0%9D%84%9E%E2%99%AF%E2%99%AD&display=block">
+<style>
+:root{
+  /* dark arena, white chart like real sheet music, the real 32-bar kit across the bottom */
+  --bg:#07080d; --panel:#10121b; --line:#262c3e; --ink:#eef1f8; --mute:#8089a1;
+  --cyan:#3ee0ff; --pink:#ff3d7f; --gold:#ffc93c;
+  --chart:#f5f6f9;
+  --ui:"Chakra Petch", system-ui, sans-serif;
+  --display:"Bungee", "Chakra Petch", system-ui, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg) radial-gradient(90% 55% at 50% -10%,#18203d 0%,transparent 70%) fixed;color:var(--ink);font:500 17px/1.35 var(--ui);font-variant-ligatures:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible+span{outline:2px solid var(--cyan);outline-offset:3px}
+.wrap{max-width:820px;margin:0 auto;padding-block:max(14px,env(safe-area-inset-top)) max(30px,env(safe-area-inset-bottom));padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+.icon{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:18px;display:grid;place-items:center;flex:none;padding:0}
+.meter{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--cyan);transition:width .35s ease-out}
+.common{--r:#aab1c2}.rare{--r:var(--cyan)}.epic{--r:#c77dff}.legendary{--r:var(--gold)}
+.rS{color:var(--gold)}.rA{color:var(--cyan)}.rB{color:var(--ink)}.rC{color:var(--mute)}.rD{color:var(--pink)}
+
+.top{display:flex;align-items:center;gap:10px}
+.who{flex:1;min-width:0}
+.who b{font:400 18px var(--display);letter-spacing:.04em}
+.who small{display:block;color:var(--mute);font-size:13px;margin:2px 0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat{display:grid;justify-items:center;padding:4px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel);min-width:58px}
+.stat b{font:400 18px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.stat small{font:700 10px var(--ui);letter-spacing:.14em;color:var(--mute)}
+.logo{font:400 clamp(46px,12.5vw,108px)/1 var(--display);text-align:center;margin:30px 0 6px;text-shadow:-3px 0 var(--pink),3px 0 var(--cyan);animation:glitch 5s steps(1) infinite}
+@keyframes glitch{0%,90%,100%{text-shadow:-3px 0 var(--pink),3px 0 var(--cyan);transform:none}92%{text-shadow:-9px 0 var(--pink),7px 0 var(--cyan);transform:translateX(4px) skewX(-8deg)}94%{text-shadow:6px 0 var(--pink),-6px 0 var(--cyan);transform:translateX(-3px)}96%{transform:none}}
+.tag{text-align:center;color:var(--mute);margin:0 0 24px;letter-spacing:.08em}
+.play{display:block;width:100%;border:0;border-radius:12px;padding:18px 16px;background:var(--cyan);color:#03141b;font:400 clamp(24px,5vw,34px)/1 var(--display);box-shadow:6px 6px 0 var(--pink);transition:transform .07s,box-shadow .07s}
+.play small{display:block;font:700 16px var(--ui);letter-spacing:.06em;margin-top:8px}
+.play:active{transform:translate(4px,4px);box-shadow:2px 2px 0 var(--pink)}
+.daily{text-align:center;color:var(--mute);margin:18px 0 0}
+.daily b{color:var(--ink)}
+.toggle{display:flex;align-items:center;justify-content:center;gap:10px;margin:14px 0 0;color:var(--mute);cursor:pointer}
+.toggle input{width:22px;height:22px;accent-color:var(--pink)}
+.toggle b{color:var(--pink)}
+h2{font:700 12px var(--ui);letter-spacing:.2em;color:var(--mute);margin:34px 0 10px;text-transform:uppercase}
+.levels{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.stage{font:700 11px var(--ui);letter-spacing:.2em;color:var(--mute);margin:12px 0 0;text-transform:uppercase}
+.lv{width:100%;display:grid;grid-template-columns:42px minmax(0,1fr) auto 46px;align-items:center;gap:12px;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:10px 14px}
+.lv .n{font:400 17px var(--display);color:var(--mute)}
+.lv .nm{font-weight:700;min-width:0}
+.lv .nm small{display:block;color:var(--mute);font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kind{font:700 10px var(--ui);letter-spacing:.14em;padding:3px 7px;border-radius:5px;border:1px solid var(--line);color:var(--mute)}
+.kind.boss{color:var(--gold);border-color:#ffc93c66}
+.lv .rk{font:400 26px var(--display);text-align:center}
+.lv.next{border-color:var(--cyan);box-shadow:inset 0 0 0 1px var(--cyan)}
+.lv:disabled{opacity:.36;cursor:default}
+.mini{position:relative;height:clamp(110px,22vw,170px);background:linear-gradient(#17181d,#0b0c10);border-radius:12px}
+.mini .bar{background:var(--mc);color:#07080d;font-size:clamp(8px,1.4vw,13px);box-shadow:inset 0 0 0 1px #0006}
+.mini .bar.acc{font-size:clamp(6px,.9vw,9px)}
+.mini .bar::before,.mini .bar::after{display:none}
+.mini .bar.m0{color:var(--mute)}
+.m0{--mc:#262c3e}.m1{--mc:#ff7aa3}.m2{--mc:var(--gold)}.m3{--mc:var(--cyan)}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin:10px 0 0;color:var(--mute);font-size:14px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--mc);margin-right:6px;vertical-align:-1px}
+.skins{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
+.skin{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:10px 6px;display:grid;gap:6px;justify-items:center;font:700 13px var(--ui)}
+.skin i{display:block;width:24px;height:54px;border-radius:3px;background:var(--face);box-shadow:inset 0 0 0 1px #0005}
+.skin small{font:700 9px var(--ui);letter-spacing:.14em;color:var(--r)}
+.skin.on{border-color:var(--cyan);box-shadow:inset 0 0 0 1px var(--cyan)}
+.skin:disabled{cursor:default;color:var(--mute)}
+.skin:disabled i{background:repeating-linear-gradient(45deg,#1b1e2b 0 6px,#121420 6px 12px)}
+
+#play{position:fixed;inset:0;display:flex;flex-direction:column;gap:8px;padding-block:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-bottom));padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
+#play.hurt{animation:hurt .36s}
+@keyframes hurt{30%{box-shadow:inset 0 0 0 6px var(--pink),inset 0 0 90px #ff3d7f88;transform:translateX(-6px)}60%{transform:translateX(5px)}}
+.hud{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(120px,1.1fr) auto;align-items:center;gap:12px;flex:none}
+.lvname small{display:block;font:700 11px var(--ui);letter-spacing:.16em;color:var(--mute)}
+.lvname b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.php{display:flex;align-items:center;gap:8px;min-width:0}
+.php small{font:700 11px var(--ui);letter-spacing:.14em;color:var(--mute)}
+.php .meter{flex:1;height:10px;min-width:50px}
+.php .meter i{background:var(--gold)}
+.php b{font:400 15px var(--display);font-variant-numeric:tabular-nums;white-space:nowrap}
+.scorebox{justify-self:end;display:flex;align-items:center;gap:10px;text-align:right}
+.scorebox b{display:block;font:400 clamp(18px,3vw,28px)/1 var(--display);font-variant-numeric:tabular-nums}
+.scorebox small{font:700 11px var(--ui);letter-spacing:.12em;color:var(--mute)}
+.mult{font:400 18px/1 var(--display);padding:7px 9px;border-radius:8px;background:var(--line);color:var(--mute)}
+.mult.m2{background:#3ee0ff26;color:var(--cyan)}
+.mult.m3{background:var(--cyan);color:#03141b}
+.mult.m4{background:var(--pink);color:#fff;animation:throb .5s ease-in-out infinite alternate}
+.mult.pop{animation:pop .3s}
+@keyframes throb{to{transform:scale(1.12)}}
+@keyframes pop{40%{transform:scale(1.5)}}
+#coach{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--cyan);border-radius:10px;padding:8px 14px;flex:none;min-height:44px;display:flex;align-items:center}
+#coach p{margin:0;font-size:clamp(14px,1.9vw,18px);line-height:1.3}
+#coach small{font:700 11px var(--ui);letter-spacing:.16em;color:var(--cyan);margin-right:10px}
+#coach.new{border-left-color:var(--gold)}#coach.new small{color:var(--gold)}
+#coach.miss{border-left-color:var(--pink)}#coach.miss small{color:var(--pink)}
+.arena{flex:1;min-height:0;display:flex;gap:8px}
+.foe{flex:0 0 clamp(110px,22vw,230px);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:0;border-radius:12px;background:radial-gradient(circle at 50% 42%,#1c2142,transparent 70%)}
+.sprite{width:min(78%,24vh);aspect-ratio:1;filter:drop-shadow(-3px 0 #ff3d7fa0) drop-shadow(3px 0 #3ee0ffa0);animation:hover 2.4s ease-in-out infinite}
+.sprite.boss{aspect-ratio:16/18}
+.sprite svg{width:100%;height:100%;display:block}
+@keyframes hover{50%{transform:translateY(-6px)}}
+.sprite.hit{animation:hit .26s}
+@keyframes hit{0%{filter:brightness(4)}30%{transform:translateX(-9px)}65%{transform:translateX(7px)}}
+.sprite.lunge{animation:lunge .5s}
+@keyframes lunge{45%{transform:scale(1.3) translateY(8px);filter:drop-shadow(0 0 18px var(--pink))}}
+.sprite.dead{animation:dead .85s forwards}
+@keyframes dead{30%{filter:brightness(4)}100%{opacity:0;transform:scaleY(.05) translateY(40px);filter:blur(6px)}}
+.foename{font:400 clamp(11px,1.6vw,15px)/1.1 var(--display);text-align:center}
+.foehp{width:86%;height:8px}
+.foehp i{background:linear-gradient(90deg,var(--pink),#ff8fb1)}
+.dmg{position:absolute;left:50%;top:26%;font:400 clamp(22px,4vw,42px)/1 var(--display);pointer-events:none;text-shadow:0 3px 0 #000;animation:dmg .8s ease-out forwards}
+@keyframes dmg{from{transform:translate(-50%,0) scale(1.5)}to{transform:translate(-50%,-56px);opacity:0}}
+.chart{flex:1;min-width:0;position:relative;background:var(--chart);border-radius:12px;overflow:hidden;transition:box-shadow .3s}
+.chart svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.chart.m2{box-shadow:0 0 22px #3ee0ff55}.chart.m3{box-shadow:0 0 34px #3ee0ff99}.chart.m4{box-shadow:0 0 44px #ff3d7fbb}
+.mus{font-family:"Noto Music","Apple Symbols","Segoe UI Symbol","Noto Sans Symbols 2",serif}
+.nlab{font:700 15px var(--ui)}
+.nt{animation:notein .14s ease-out}
+@keyframes notein{from{opacity:0;transform:translateX(30px)}}
+.fuse{position:absolute;left:0;right:0;bottom:0;height:8px;background:#dfe3ec}
+.fuse i{display:block;height:100%;width:100%;background:var(--cyan)}
+.fuse.second i{background:var(--pink)}
+.judge{position:absolute;top:10px;right:12px;font:400 clamp(16px,2.6vw,26px)/1 var(--display);background:#07080de6;padding:8px 12px;border-radius:8px;pointer-events:none;opacity:0}
+.judge.on{animation:judge .7s ease-out}
+@keyframes judge{0%{opacity:0;transform:translateY(8px) scale(.9)}15%{opacity:1;transform:none}70%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+.overlay{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:8px;background:#07080de0;font:400 clamp(24px,4.6vw,52px)/1.05 var(--display);text-align:center;padding:12px}
+.overlay small{font:700 13px var(--ui);letter-spacing:.18em;color:var(--mute)}
+.overlay p{font:500 clamp(15px,2vw,19px)/1.4 var(--ui);max-width:34em;margin:0;color:var(--ink)}
+.bells{position:relative;height:clamp(160px,42vh,380px);flex:none;background:linear-gradient(#17181d,#0b0c10);border-radius:14px;box-shadow:inset 0 0 0 1px #ffffff12}
+.kit{position:absolute;inset:8px 10px}
+.rails{position:absolute;inset:0;width:100%;height:100%}
+.rails line{stroke:#000;stroke-width:6;vector-effect:non-scaling-stroke}
+.bar{position:absolute;border:0;padding:0;border-radius:3px;background:var(--face);color:var(--lab);box-shadow:inset 0 0 0 1px #0005,inset 2px 0 0 #ffffff55,0 3px 5px #000b;display:grid;place-items:center;font:700 clamp(12px,1.7vw,20px)/1.05 var(--ui);text-align:center;touch-action:none;transition:transform .06s,filter .06s}
+.bar.acc{font-size:clamp(8px,1.15vw,13px)}
+.bar::before,.bar::after{content:"";position:absolute;left:50%;width:clamp(4px,.7vw,7px);aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#9aa0a8 60%,#4a4e55);box-shadow:0 0 0 1px #0007}
+.bar::before{top:11%}.bar::after{bottom:11%}
+.bar.down{filter:brightness(1.2);transform:translateY(2px)}
+.bar.ok{box-shadow:0 0 0 3px var(--cyan),0 0 24px var(--cyan)}
+.bar.bad{box-shadow:0 0 0 3px var(--pink),0 0 24px var(--pink)}
+.bar.want{animation:want .65s ease-in-out infinite}
+@keyframes want{50%{box-shadow:0 0 0 4px var(--cyan),0 0 30px 8px var(--cyan)}}
+.bells.nolab .lab{visibility:hidden}
+.skin-neon .bar{box-shadow:inset 0 0 0 2px var(--cyan),0 0 10px #3ee0ff66}
+.skin-holo .bar{background-size:100% 300%;animation:holo 4s linear infinite}
+@keyframes holo{to{background-position:0 300%}}
+.spark{position:absolute;left:50%;top:20%;width:6px;height:6px;pointer-events:none;animation:fly .55s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--dx),var(--dy));opacity:0}}
+.rotate{display:none}
+@media (orientation:portrait) and (max-width:720px){#play .rotate{display:grid;position:fixed;inset:0;z-index:9;place-content:center;gap:10px;text-align:center;background:var(--bg);font:400 26px/1.3 var(--display);padding:24px}}
+.rotate small{font:500 16px var(--ui);color:var(--mute)}
+
+#results{text-align:center}
+.rhead{font:400 clamp(26px,6vw,44px)/1.1 var(--display);margin:22px 0 0}
+.rlabel{font:700 12px var(--ui);letter-spacing:.2em;color:var(--mute);margin:8px 0 0;text-transform:uppercase}
+.rank{font:400 clamp(100px,24vw,170px)/1 var(--display);margin:6px 0 0;text-shadow:-4px 0 var(--pink),4px 0 var(--cyan)}
+.rank.slam{animation:slam .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes slam{from{transform:scale(2.6);opacity:0;filter:blur(8px)}}
+.rscore{font:400 clamp(30px,6vw,50px)/1 var(--display);font-variant-numeric:tabular-nums}
+.rscore small{display:block;font:700 11px var(--ui);letter-spacing:.2em;color:var(--mute);margin-top:6px}
+.pb{display:inline-block;background:var(--gold);color:#241800;font:400 14px var(--display);padding:6px 10px;border-radius:6px;margin:12px 0 0;transform:rotate(-3deg)}
+.rstats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0 0}
+.rstats div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 6px}
+.rstats b{display:block;font:400 22px/1.2 var(--display);font-variant-numeric:tabular-nums}
+.rstats small{font:700 10px var(--ui);letter-spacing:.14em;color:var(--mute)}
+.banner{margin:16px 0 0;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
+.banner b{color:var(--gold)}
+.drop{margin:16px 0 0;padding:16px;border-radius:14px;border:1px solid #ffc93c66;background:var(--panel)}
+.drop p{margin:0 0 12px}
+.dice{display:flex;justify-content:center;gap:18px;margin:0 0 16px}
+.die{width:96px;height:96px;display:grid;place-items:center;font:400 30px var(--display);color:#241800;background:linear-gradient(135deg,#fff1b8,var(--gold) 50%,#b8861c);clip-path:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);transition:opacity .4s,filter .4s}
+.die.rolling{animation:roll .13s linear infinite}
+@keyframes roll{50%{transform:rotate(18deg) scale(.9)}}
+.die.lose{opacity:.3;filter:grayscale(1)}
+.prize{display:flex;align-items:center;justify-content:center;gap:16px}
+.prize i{display:block;width:30px;height:76px;border-radius:3px;background:var(--face);box-shadow:inset 0 0 0 1px #0005}
+.prize b{display:block;font:400 22px var(--display)}
+.prize small{font:700 11px var(--ui);letter-spacing:.14em;color:var(--r)}
+.raven{color:var(--mute);margin:16px 0 0}
+.row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.row>*{flex:1 1 150px}
+.ghost{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:16px;font:400 16px var(--display)}
+@media (max-width:540px){.rstats{grid-template-columns:repeat(2,1fr)}}
+
+dialog{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:14px;width:min(460px,calc(100% - 32px));padding:20px;-webkit-user-select:text;user-select:text}
+dialog::backdrop{background:#000c}
+dialog h2{margin-top:0}
+dialog a{color:var(--cyan)}
+dialog code{display:block;-webkit-user-select:all;user-select:all;background:#000;padding:10px;border-radius:8px;font-size:16px;margin:6px 0;word-break:break-all}
+dialog button{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 14px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<section id="home" class="wrap">
+  <header class="top">
+    <div class="who"><b class="kid"></b><small id="lvl"></small><div class="meter"><i id="xpFill"></i></div></div>
+    <div class="stat" title="Day streak"><b id="streak">0</b><small>🔥 DAYS</small></div>
+    <div class="stat" title="Battles today"><b id="dailyN">0/3</b><small>TODAY</small></div>
+    <button class="icon" id="grownBtn" aria-label="Grown-up settings">⚙︎</button>
+  </header>
+  <h1 class="logo">OVERTONE</h1>
+  <p class="tag">READ IT · HIT IT FAST · 32 BARS</p>
+  <button class="play" id="playBtn">▶ FIGHT<small id="playSub"></small></button>
+  <p class="daily" id="daily"></p>
+  <label class="toggle"><input type="checkbox" id="noLabels"><span>Hide bar letters <b>×1.5 damage</b></span></label>
+  <h2>Note mastery · <span id="mastCount"></span></h2>
+  <div class="mini"><div class="kit" id="mini"></div></div>
+  <p class="legend"><span class="m0"><i></i>not seen</span><span class="m1"><i></i>learning</span><span class="m2"><i></i>almost</span><span class="m3"><i></i>mastered</span><span>Staff letters fade out as a note turns gold, then go away at blue.</span></p>
+  <h2>Levels</h2>
+  <ol class="levels" id="levels"></ol>
+  <h2>Bar skins · <span id="skinCount"></span></h2>
+  <div class="skins" id="skins"></div>
+</section>
+
+<section id="play" hidden>
+  <header class="hud">
+    <button class="icon" id="quit" aria-label="Run away">✕</button>
+    <div class="lvname"><small id="hudKind"></small><b id="hudName"></b></div>
+    <div class="php"><small class="kid"></small><div class="meter"><i id="hpFill"></i></div><b id="hpTxt"></b></div>
+    <div class="scorebox"><div><b id="score">0</b><small id="comboN"></small></div><span class="mult" id="mult">×1</span></div>
+  </header>
+  <div id="coach"><p><small id="coachKind"></small><span id="coachText"></span></p></div>
+  <div class="arena">
+    <div class="foe" id="foe"><div class="sprite" id="sprite"></div><div class="foename" id="foeName"></div><div class="meter foehp"><i id="foeHp"></i></div></div>
+    <div class="chart" id="chart"><div id="staff"></div><div class="fuse" id="fuseBox"><i id="fuse"></i></div><div class="judge" id="judge"></div><div class="overlay" id="overlay" hidden></div></div>
+  </div>
+  <div class="bells" id="bells"><div class="kit" id="kit"></div></div>
+  <div class="rotate">TURN IT SIDEWAYS ↻<small>All 32 bars need the wide screen.</small></div>
+</section>
+
+<section id="results" class="wrap" hidden>
+  <div class="rhead" id="rHead"></div>
+  <p class="rlabel" id="rTitle"></p>
+  <div class="rank" id="rank"></div>
+  <div class="rscore"><span id="rScore">0</span><small>DAMAGE</small></div>
+  <p class="pb" id="pb" hidden>NEW BEST</p>
+  <div class="rstats" id="rStats"></div>
+  <div class="banner" id="banner" hidden></div>
+  <div class="drop" id="drop" hidden>
+    <p id="dropText"></p>
+    <div class="dice" id="dice"></div>
+    <button class="play" id="rollBtn">ROLL d20</button>
+    <div id="prize"></div>
+  </div>
+  <p class="raven" id="raven" hidden></p>
+  <div class="row" id="rBtns"><button class="ghost" id="menuBtn">MENU</button><button class="ghost" id="againBtn">RUN IT BACK</button><button class="play" id="nextBtn">NEXT ▶</button></div>
+</section>
+
+<dialog id="grown">
+  <h2>For grown-ups</h2>
+  <p>Get a phone alert when <span class="kid"></span> clears a level or finishes the daily practice.</p>
+  <ol>
+    <li>Install the free <a href="https://ntfy.sh" target="_blank" rel="noopener">ntfy</a> app on your phone.</li>
+    <li>In the app, subscribe to this topic:<code id="topic"></code></li>
+    <li>Tap “Send test”.</li>
+  </ol>
+  <p><button id="testRaven">Send test</button> <span id="testOut"></span></p>
+  <p><button id="resetBtn">Reset progress on this device</button></p>
+  <form method="dialog"><button>Close</button></form>
+</dialog>
+
+<script>
+const CONFIG = {
+  kid: 'Tadzio',
+  grownup: '', // what Tadzio calls you, e.g. 'Papa'. Shown when the alert goes out.
+  ntfyTopic: 'glockenquest-f01f9cd186c4',
+  maxHp: 20,
+  dailyRuns: 3,
+  secondChance: 4, // seconds to find the right bar after a miss
+};
+
+const $ = s => document.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const fmt = n => Math.round(n).toLocaleString('en-US');
+
+/* ---------- notes: written pitch, as on a bell part ---------- */
+const LOW = 53, HIGH = 84; // F3..C6 written = the 32-bar kit (sounds two octaves higher)
+const PC = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+const SHARPS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const FLATS = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+const isBlack = m => [1, 3, 6, 8, 10].includes(m % 12);
+const pretty = s => s.replace('#', '♯').replace('b', '♭');
+function note(t) {
+  const [, L, a, o] = t.match(/^([A-G])([#b]?)(\d)$/), oct = +o, acc = a === '#' ? 1 : a === 'b' ? -1 : 0;
+  return { key: L + a + o, name: pretty(L + a), midi: 12 * (oct + 1) + PC[L] + acc, step: oct * 7 + 'CDEFGAB'.indexOf(L) - 30, acc };
+}
+const keyOf = (m, flat) => (flat ? FLATS : SHARPS)[m % 12] + (Math.floor(m / 12) - 1);
+const ALL = [], NATS = [];
+for (let m = LOW; m <= HIGH; m++) isBlack(m) ? ALL.push(keyOf(m), keyOf(m, true)) : (ALL.push(keyOf(m)), NATS.push(m));
+const barName = m => isBlack(m) ? pretty(FLATS[m % 12]) : SHARPS[m % 12];
+
+/* ---------- levels: read = [starting seconds per note, fastest it adapts to] ---------- */
+const LEVELS = [
+  { stage: 'Band five', name: 'First Notes', pool: 'Bb4 C5 D5', foe: ['wraith', 'Static Wraith', '#9fb0ff'], hp: 160, atk: 2, read: [6, 2.5],
+    brief: 'Band books start here: B♭, C and D. A new note glows the first time you see it. After that, read it fast. Under 1 second is a crit.', ask: 'Where is B♭ on your bells?' },
+  { name: 'Band Five', pool: 'Bb4 C5 D5 Eb5 F5', foe: ['mask', 'Hollow Mask', '#ff8fab'], boss: true, hp: 260, atk: 2, read: [5.5, 2.2],
+    brief: 'Boss fight. Two new notes: E♭ and F. Flats live in the back row.', ask: 'Which row is E♭ in?' },
+  { stage: 'B♭ major', name: 'Low Side', pool: 'G4 A4 Bb4 C5 D5 Eb5 F5', foe: ['eye', 'The Watcher', '#ffd36b'], hp: 240, atk: 3, read: [5.5, 2.2],
+    brief: 'Going down the staff: A and G.', ask: 'Where is G on the staff?' },
+  { name: 'B♭ Major', pool: 'G4 A4 Bb4 C5 D5 Eb5 F5 G5 A5 Bb5', foe: ['wraith', 'Feedback Wraith', '#ff6b9a'], boss: true, hp: 320, atk: 3, read: [5, 2],
+    brief: 'Boss fight. Going up past the top line: G, A and B♭.', ask: 'Can you play a B♭ scale for me?' },
+  { stage: 'Naturals and flats', name: 'Naturals', pool: 'E4 F4 G4 A4 B4 C5 D5 E5 F5 G5', foe: ['mask', 'Sour Mask', '#b6ff7a'], hp: 260, atk: 3, read: [5, 2],
+    brief: 'No flats now. Plain B and plain E are front-row bars.', ask: 'What is the difference between B and B♭?' },
+  { name: 'Flat or Not', pool: 'E4 F4 G4 A4 Bb4 B4 C5 D5 Eb5 E5 F5 G5', foe: ['eye', 'Doubt Eye', '#c79bff'], boss: true, hp: 340, atk: 3, read: [5, 1.9],
+    brief: 'Boss fight. Watch for the ♭. B and B♭ are different bars. So are E and E♭.', ask: 'How do you spot a flat?' },
+  { stage: 'Sharps', name: 'Sharps', pool: 'E4 F4 F#4 G4 G#4 A4 B4 C5 C#5 D5 D#5 E5 F5', foe: ['wraith', 'Sharp Shade', '#7af0ff'], hp: 280, atk: 3, read: [5, 1.9],
+    brief: 'A ♯ (sharp) means one bar up, into the back row.', ask: 'What does a sharp do?' },
+  { name: 'Two Names', pool: 'F#4 Gb4 G#4 Ab4 A#4 Bb4 C#5 Db5 D#5 Eb5 F#5 Gb5 A4 C5 D5 F5 G5', foe: ['mask', 'Two-Face', '#ffb36b'], boss: true, hp: 360, atk: 4, read: [5, 1.8],
+    brief: 'Boss fight. A♯ and B♭ are the same bar. One bar, two names.', ask: 'Why do A♯ and B♭ use the same bar?' },
+  { stage: 'Ledger lines', name: 'Basement', pool: 'F3 G3 A3 B3 C4 C#4 D4 E4 F4 G4', foe: ['eye', 'Deep Watcher', '#6bffc4'], hp: 280, atk: 4, read: [5.5, 2],
+    brief: 'Below the staff, on ledger lines. Count them: line, space, line.', ask: 'How many ledger lines does your lowest F have?' },
+  { name: 'Attic', pool: 'E5 F5 G5 A5 Bb5 B5 C6', foe: ['wraith', 'Attic Wraith', '#ffe08a'], boss: true, hp: 340, atk: 4, read: [5.5, 2],
+    brief: 'Boss fight. Above the staff, up to your highest bar.', ask: 'Where is your highest C on the staff?' },
+  { stage: 'All 32', name: 'Full Kit', pool: 'all', foe: ['eye', 'The Conductor', '#ff3d7f'], boss: true, hp: 560, atk: 5, read: [4.5, 1.5],
+    brief: 'Final boss. All 32 bars, and both names for every back-row bar.', ask: 'Which bar is the hardest to find?' },
+];
+const ENDLESS = { name: 'Gauntlet', pool: 'all', read: [4, 1.2], brief: 'Monsters until you drop. Every one is faster.' };
+const ROSTER = [['wraith', 'Static Wraith', '#9fb0ff'], ['mask', 'Hollow Mask', '#ff8fab'], ['eye', 'The Watcher', '#ffd36b'], ['wraith', 'Sharp Shade', '#7af0ff'], ['mask', 'Sour Mask', '#b6ff7a'], ['eye', 'Doubt Eye', '#c79bff']];
+const levelOf = k => k < LEVELS.length ? LEVELS[k] : ENDLESS;
+function foeFor(L, i) {
+  if (L !== ENDLESS) { const [kind, name, color] = L.foe; return { kind, name, color, crown: !!L.boss, hp: L.hp, atk: L.atk }; }
+  const [kind, name, color] = ROSTER[i % ROSTER.length];
+  return { kind, name, color, crown: i % 3 === 2, hp: 200 + 60 * i, atk: Math.min(6, 2 + Math.floor(i / 2)) };
+}
+
+const TITLES = ['Rookie', 'Striker', 'Resonator', 'Sight Reader', 'Bell Knight', 'Overtone', 'Virtuoso', 'Legend'];
+const SKINS = {
+  steel: ['Brushed Steel', 'common', 'linear-gradient(90deg,#8e959f,#eef0f3 30%,#c5cad1 62%,#8a919b)', '#262a31'],
+  black: ['Blackout', 'common', 'linear-gradient(90deg,#0d0e11,#3a3d45 32%,#22242a 66%,#0d0e11)', '#c9cdd6'],
+  copper: ['Copper', 'common', 'linear-gradient(90deg,#7a3e22,#f0b38c 32%,#c97a4e 65%,#7a3e22)', '#2d1206'],
+  gold: ['Gold', 'rare', 'linear-gradient(90deg,#8a650f,#ffe9a3 32%,#e2b33b 65%,#8a650f)', '#3a2800'],
+  ice: ['Ice', 'rare', 'linear-gradient(90deg,#5aa3b6,#f2fdff 32%,#aee9f6 65%,#5aa3b6)', '#0b3a47'],
+  neon: ['Neon', 'epic', 'linear-gradient(90deg,#0b0d16,#1a1f33 50%,#0b0d16)', '#3ee0ff'],
+  magma: ['Magma', 'epic', 'linear-gradient(180deg,#ffd27a,#ff5a2b 45%,#8a1406)', '#2a0500'],
+  holo: ['Holo', 'legendary', 'linear-gradient(180deg,#ff9be2,#9bf0ff,#c3ff9b,#ffe79b,#d79bff,#ff9be2,#9bf0ff)', '#241a33'],
+  void: ['Void', 'legendary', 'radial-gradient(circle at 50% 30%,#7b5cff,#1b0f4a 55%,#05030f)', '#e6deff'],
+};
+const SPR = {
+  wraith: ['.....XXXXXX.....', '....XXXXXXXX....', '...XXXXXXXXXX...', '..XXX......XXX..', '..XX........XX..', '.XXX.EE..EE.XXX.', '.XX..EE..EE..XX.', '.XX..........XX.',
+    '.XXX...MM...XXX.', '..XX........XX..', '..XXX......XXX..', '..XXXXXXXXXXXX..', '.XXXXXXXXXXXXXX.', '.XXX.XXXXXX.XXX.', 'XX...XX..XX...XX', 'X....X....X....X'],
+  mask: ['X..............X', 'XX............XX', '.XX..XXXXXX..XX.', '..XXXXXXXXXXXX..', '..XXXXXXXXXXXX..', '.XXXXXXXXXXXXXX.', '.XXX..XXXX..XXX.', '.XX.EE.XX.EE.XX.',
+    '.XXX..XXXX..XXX.', '.XXXXXXXXXXXXXX.', '..XXXXX..XXXXX..', '..XXXX....XXXX..', '...XX.M.M.M.XX..', '...XXXXXXXXXX...', '....XXXXXXXX....', '......XXXX......'],
+  eye: ['.......XX.......', '...X...XX...X...', '....X..XX..X....', '.....XXXXXX.....', '...XXXXXXXXXX...', '..XXX......XXX..', '.XXX..EEEE..XXX.', 'XXX..EEKKEE..XXX',
+    'XXX..EEKKEE..XXX', '.XXX..EEEE..XXX.', '..XXX......XXX..', '...XXXXXXXXXX...', '.....XXXXXX.....', '....X..XX..X....', '...X...XX...X...', '.......XX.......'],
+};
+const CROWN = ['...Y..YYYY..Y...', '...YYYYYYYYYY...'];
+const PAL = { E: '#ffffff', K: '#07080d', M: '#07080d', Y: '#ffc93c' };
+function sprite(kind, color, crown) {
+  const rows = crown ? [...CROWN, ...SPR[kind]] : SPR[kind];
+  let r = '';
+  rows.forEach((row, y) => [...row].forEach((ch, x) => { if (ch !== '.') r += `<rect x="${x}" y="${y}" width="1.03" height="1.03" fill="${ch === 'X' ? color : PAL[ch]}"/>`; }));
+  return `<svg viewBox="0 0 16 ${rows.length}" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
+}
+
+/* ---------- sound ---------- */
+let ac, out;
+function audio() {
+  if (!ac) {
+    if (navigator.audioSession) navigator.audioSession.type = 'playback';
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    out = ac.createDynamicsCompressor(); out.connect(ac.destination);
+  }
+  if (ac.state === 'suspended') ac.resume();
+  return ac;
+}
+function tone(f, at, dur, type = 'sine', vol = .3) {
+  const a = audio(), o = a.createOscillator(), g = a.createGain(), t = a.currentTime + at;
+  o.type = type; o.frequency.value = f;
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .003); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  o.connect(g).connect(out); o.start(t); o.stop(t + dur + .05);
+}
+const hz = m => 440 * 2 ** ((m + 24 - 69) / 12); // bells sound two octaves above the written note
+function bell(m, at = 0, vol = .26) {
+  const f = hz(m), v = vol * (1 - (m - LOW) / 70);
+  tone(f, at, 2.2, 'sine', v);
+  if (f * 2.76 < 16000) tone(f * 2.76, at, .35, 'sine', v * .18);
+  if (f * 5.4 < 16000) tone(f * 5.4, at, .12, 'sine', v * .08);
+}
+const buzz = () => { tone(110, 0, .14, 'sawtooth', .07); tone(82, 0, .18, 'square', .05); };
+const thud = () => { tone(64, 0, .3, 'sine', .45); tone(130, 0, .08, 'square', .08); };
+const tick = (f = 1400) => tone(f, 0, .04, 'square', .04);
+const chord = (ms, at = 0, vol = .18) => ms.forEach((m, k) => bell(m, at + k * .06, vol));
+
+/* ---------- save ---------- */
+const KEY = 'overtone:v1';
+function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch {} }
+const st = Object.assign({ clear: {}, best: {}, xp: 0, m: {}, seen: {}, streak: 0, lastDay: '', day: '', today: { runs: 0, hits: 0, notes: 0, best: 0 }, skins: { steel: 1 }, skin: 'steel', noLabels: false, outbox: [] }, load());
+
+const dayStr = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const dayNum = s => Math.round(Date.parse(s + 'T12:00:00Z') / 864e5);
+const gapDays = (from, to) => from ? dayNum(to) - dayNum(from) : Infinity;
+function bumpStreak(s, today) { const g = gapDays(s.lastDay, today); if (g === 0) return; s.streak = g <= 2 ? s.streak + 1 : 1; s.lastDay = today; }
+const liveStreak = () => gapDays(st.lastDay, dayStr()) <= 2 ? st.streak : 0;
+const runsToday = () => st.day === dayStr() ? st.today.runs : 0;
+const lvlFor = xp => { let l = 1; while (xp >= 75 * l * (l + 1)) l++; return l; };
+const titleFor = l => TITLES[Math.min(l, TITLES.length) - 1];
+const mult = combo => Math.min(4, 1 + Math.floor(combo / 4));
+const rarityFor = roll => roll === 20 ? 'legendary' : roll >= 18 ? 'epic' : roll >= 11 ? 'rare' : 'common';
+function rankFor({ won, acc, hpLost, dealt, kills }) {
+  if (kills !== undefined) return kills >= 6 ? 'S' : kills >= 4 ? 'A' : kills >= 2 ? 'B' : kills >= 1 ? 'C' : 'D';
+  if (!won) return dealt >= .6 ? 'C' : 'D';
+  return acc >= .95 && !hpLost ? 'S' : acc >= .88 ? 'A' : 'B';
+}
+const nextLevel = () => { const k = LEVELS.findIndex((_, k) => !st.clear[k]); return k < 0 ? LEVELS.length : k; };
+const unlocked = k => k === 0 || !!st.clear[k - 1];
+const adapt = (read, ok, [slow, fast]) => ok ? Math.max(fast, read * .94) : Math.min(slow, read * 1.15);
+const takeDue = (queue, turn) => queue.findIndex(q => q.due <= turn);
+
+/* ---------- mastery: last 10 first tries per spelled note ---------- */
+function record(key, ok) { st.m[key] = ((st.m[key] || '') + (ok ? '1' : '0')).slice(-10); }
+const accOf = h => h ? [...h].filter(c => c === '1').length / h.length : null;
+const mastery = h => !h ? 0 : h.length < 4 || accOf(h) < .8 ? 1 : h.length < 8 || accOf(h) < .9 ? 2 : 3;
+const barLevel = m => mastery((st.m[keyOf(m)] || '') + (isBlack(m) ? st.m[keyOf(m, true)] || '' : ''));
+const masteredSet = () => { const s = []; for (let m = LOW; m <= HIGH; m++) if (barLevel(m) === 3) s.push(m); return s; };
+
+/* ---------- teaching words ---------- */
+const ORD = ['1st', '2nd', '3rd', '4th'];
+function where(n) {
+  const s = n.step;
+  if (s === 0) return 'on the bottom line';
+  if (s === 4) return 'on the middle line';
+  if (s === 8) return 'on the top line';
+  if (s > 0 && s < 8) return s % 2 ? `in the ${ORD[(s - 1) / 2]} space` : `on the ${ORD[s / 2]} line`;
+  if (s === -1) return 'just under the staff';
+  if (s === 9) return 'just on top of the staff';
+  if (s < 0) { const l = Math.floor(-s / 2); return s % 2 ? `under ledger line ${l} below the staff` : `on ledger line ${l} below the staff`; }
+  const l = Math.floor((s - 8) / 2);
+  return s % 2 ? `above ledger line ${l} over the staff` : `on ledger line ${l} above the staff`;
+}
+const natWhere = m => `${ORD[NATS.filter(x => x % 12 === m % 12).indexOf(m)]} ${SHARPS[m % 12]} from the left`;
+const barWhere = n => isBlack(n.midi) ? `back row, just ${n.acc < 0 ? 'left' : 'right'} of the ${natWhere(n.acc < 0 ? n.midi + 1 : n.midi - 1)}` : `front row, the ${natWhere(n.midi)}`;
+const sym = n => n.acc < 0 ? '♭' : '♯';
+function spellLike(m, t) {
+  if (!isBlack(m)) return note(keyOf(m));
+  const s = note(keyOf(m)), f = note(keyOf(m, true));
+  return s.key[0] === t.key[0] ? s : f.key[0] === t.key[0] ? f : t.acc < 0 ? f : s;
+}
+function explain(t, m) {
+  const h = spellLike(m, t);
+  if (h.midi % 12 === t.midi % 12) return `Right name, wrong octave. Look again: ${where(t)}.`;
+  if (h.key[0] === t.key[0]) return t.acc ? `Watch the ${sym(t)}. It is a back-row bar.` : `No ${sym(h)} on this note. It is a front-row bar.`;
+  const d = t.step - h.step, n = Math.abs(d), s = n > 1 ? 's' : '';
+  return `You hit ${h.name}. This note is ${n} step${s} ${d > 0 ? 'higher' : 'lower'} on the staff, so ${n} letter${s} to the ${d > 0 ? 'right' : 'left'}.`;
+}
+const COACH = { new: 'NEW NOTE', battle: 'READ', miss: 'WHY' };
+function coach(text, kind) { $('#coach').className = kind; $('#coachKind').textContent = COACH[kind]; $('#coachText').textContent = text; }
+
+/* ---------- staff: one note at a time ---------- */
+const S = 14, TOP = 3 * S, BOT = TOP + 4 * S, H = BOT + 5 * S, SW = 300, NX = 180;
+const INK = '#11131a', RED = '#e0245e';
+const yOf = step => BOT - step * S / 2;
+const wrap = g => `<svg viewBox="0 0 ${SW} ${H}" role="img" aria-label="A note on the staff">${g}</svg>`;
+function staffBase() {
+  let g = '';
+  for (let k = 0; k < 5; k++) g += `<line x1="0" x2="${SW}" y1="${TOP + k * S}" y2="${TOP + k * S}" stroke="${INK}" stroke-width="1.4"/>`;
+  return g + `<text class="mus" x="4" y="${BOT + 1.05 * S}" font-size="${4.4 * S}" fill="${INK}">𝄞</text>`;
+}
+function ledgers(x, step, color, op = 1) {
+  let s = '';
+  for (let k = -2; k >= step; k -= 2) s += `<line x1="${x - S * 1.15}" x2="${x + S * 1.15}" y1="${yOf(k)}" y2="${yOf(k)}" stroke="${color}" stroke-width="1.4" opacity="${op}"/>`;
+  for (let k = 10; k <= step; k += 2) s += `<line x1="${x - S * 1.15}" x2="${x + S * 1.15}" y1="${yOf(k)}" y2="${yOf(k)}" stroke="${color}" stroke-width="1.4" opacity="${op}"/>`;
+  return s;
+}
+const accSVG = (x, n, color) => `<text class="mus" x="${x - S * .64 - 9}" y="${yOf(n.step) + (n.acc < 0 ? .3 : .5) * S}" font-size="${2 * S}" text-anchor="middle" fill="${color}">${sym(n)}</text>`;
+const head = (x, y, attrs) => `<ellipse cx="${x}" cy="${y}" rx="${S * .64}" ry="${S * .46}" transform="rotate(-20 ${x} ${y})" ${attrs}/>`;
+function noteSVG(x, n, lab) {
+  const y = yOf(n.step), up = n.step < 4, sx = up ? x + S * .64 - .8 : x - S * .64 + .8;
+  return ledgers(x, n.step, INK) + (n.acc ? accSVG(x, n, INK) : '') + head(x, y, `fill="${INK}"`)
+    + `<line x1="${sx}" x2="${sx}" y1="${y}" y2="${up ? y - 3.4 * S : y + 3.4 * S}" stroke="${INK}" stroke-width="1.8"/>`
+    + (lab ? `<text class="nlab" x="${x}" y="${H - 5}" text-anchor="middle" fill="${lab[1]}">${lab[0]}</text>` : '');
+}
+const ghostSVG = (x, h) => ledgers(x, h.step, RED, .5) + (h.acc ? accSVG(x + 3, h, RED) : '') + head(x + 3, yOf(h.step), `fill="none" stroke="${RED}" stroke-width="2" stroke-dasharray="3 2"`);
+function labelFor(n) {
+  if (n.tries >= 2) return [n.name, RED];
+  const lv = n.isNew ? 0 : mastery(st.m[n.key]);
+  return lv <= 1 ? [n.name, '#2b3350'] : lv === 2 ? [n.name, '#c3c8d3'] : null;
+}
+function renderNote(r, fresh) {
+  const n = r.n, tag = n.isNew ? ['NEW', '#c99700'] : n.again ? ['AGAIN', RED] : null;
+  let g = staffBase();
+  if (tag) g += `<text class="nlab" x="${SW - 10}" y="20" text-anchor="end" fill="${tag[1]}">${tag[0]}</text>`;
+  if (n.wrong !== undefined) g += ghostSVG(NX, spellLike(n.wrong, n));
+  g += `<g${fresh ? ' class="nt"' : ''}>${noteSVG(NX, n, labelFor(n))}</g>`;
+  $('#staff').innerHTML = wrap(g);
+}
+
+/* ---------- the bells ---------- */
+const BARS = [];
+function kitHTML(mini) {
+  const w = 100 / NATS.length, len = m => 1 - .42 * (m - LOW) / (HIGH - LOW), ROW = { acc: [1, 41], nat: [48, 52] };
+  const rail = (kind, f) => { const [t, h] = ROW[kind], y = l => t + h * (1 - l) / 2 + h * l * f; return `<line x1="0" x2="100" y1="${y(1)}" y2="${y(len(HIGH))}"/>`; };
+  let html = `<svg class="rails" viewBox="0 0 100 100" preserveAspectRatio="none">${['acc', 'nat'].map(k => rail(k, .11) + rail(k, .89)).join('')}</svg>`;
+  for (let m = LOW; m <= HIGH; m++) {
+    const black = isBlack(m), [t, h] = ROW[black ? 'acc' : 'nat'], l = len(m), tag = mini ? 'div' : 'button';
+    const j = black ? NATS.indexOf(m - 1) + 1 : NATS.indexOf(m), bw = black ? w * .78 : w * .86, left = black ? j * w - bw / 2 : j * w + (w - bw) / 2;
+    const sh = pretty(SHARPS[m % 12]), fl = pretty(FLATS[m % 12]);
+    html += `<${tag} class="bar${black ? ' acc' : ''}${mini ? ' m' + barLevel(m) : ''}"${mini ? '' : ` data-m="${m}" aria-label="${black ? `${sh} or ${fl}` : sh}"`} style="left:${left}%;top:${t + h * (1 - l) / 2}%;width:${bw}%;height:${h * l}%"><span class="lab">${black ? `${sh}<br>${fl}` : sh}</span></${tag}>`;
+  }
+  return html;
+}
+function buildBells() {
+  $('#kit').innerHTML = kitHTML(false);
+  for (const b of $('#kit').querySelectorAll('.bar')) BARS[+b.dataset.m] = b;
+}
+function applyLook() {
+  const [, , face, lab] = SKINS[st.skin] || SKINS.steel, el = $('#bells');
+  el.className = `bells skin-${st.skin}${st.noLabels ? ' nolab' : ''}`;
+  el.style.setProperty('--face', face); el.style.setProperty('--lab', lab);
+}
+function flash(el, cls, ms) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); }
+const glowWant = m => BARS.forEach((b, i) => b && b.classList.toggle('want', i === m));
+function sparks(b, color) {
+  for (let k = 0; k < 8; k++) {
+    const s = document.createElement('i');
+    s.className = 'spark'; s.style.cssText = `background:${color};--dx:${(Math.random() - .5) * 90}px;--dy:${-30 - Math.random() * 70}px`;
+    b.append(s); setTimeout(() => s.remove(), 560);
+  }
+}
+
+/* ---------- battle: one note, a few seconds, one second chance ---------- */
+let run = null;
+function poolOf(L) {
+  const keys = L.pool === 'all' ? ALL : L.pool.split(' ');
+  return keys.map(k => { const n = note(k); return { n, w: L.pool === 'all' && n.acc ? .5 : 1 }; });
+}
+function draw(pool, lastMidi) {
+  const w = pool.map(p => p.n.midi === lastMidi ? 0 : p.w * (1 + 2 * (1 - (accOf(st.m[p.n.key]) ?? .5))));
+  let x = Math.random() * w.reduce((a, b) => a + b), j = 0;
+  while ((x -= w[j]) > 0 && j < w.length - 1) j++;
+  return { ...pool[j].n };
+}
+const rotated = () => matchMedia('(orientation:portrait) and (max-width:720px)').matches;
+function tapOverlay(html, ms) {
+  return new Promise(res => {
+    const o = $('#overlay'); o.innerHTML = html; o.hidden = false;
+    const done = () => { clearTimeout(t); o.hidden = true; o.onpointerdown = null; res(); };
+    const t = ms ? setTimeout(done, ms) : 0;
+    o.onpointerdown = done;
+  });
+}
+function setFoe(r, i) {
+  const f = r.foe = foeFor(r.L, i); f.max = f.hp;
+  const s = $('#sprite'); s.className = `sprite${f.crown ? ' boss' : ''}`; s.innerHTML = sprite(f.kind, f.color, f.crown);
+  $('#foeName').textContent = f.name; foeBar();
+}
+const foeBar = () => { $('#foeHp').style.width = `${run.foe.hp / run.foe.max * 100}%`; };
+async function startLevel(k, retry = []) {
+  audio();
+  const L = levelOf(k);
+  const r = run = { k, L, pool: poolOf(L), read: L.read[0], hp: CONFIG.maxHp, hpLost: 0, kills: 0, notes: 0, hits: 0, crits: 0, times: [], combo: 0, best: 0, score: 0,
+    phase: 'intro', turn: 0, tok: 0, queue: retry.map((n, i) => ({ n, due: i * 2 })), missed: [], lastMidi: null, n: null, masteredBefore: masteredSet() };
+  show('play');
+  $('#hudName').textContent = L.name;
+  $('#play').classList.remove('hurt'); $('#judge').classList.remove('on'); glowWant(-1);
+  setFoe(r, 0); hud();
+  $('#staff').innerHTML = wrap(staffBase()); $('#fuse').style.width = '100%';
+  coach(retry.length ? 'The notes you missed last time come first.' : L.brief, 'new');
+  await tapOverlay(`${r.foe.name}<p>${retry.length ? `Rematch. Your ${retry.length} missed note${retry.length > 1 ? 's come' : ' comes'} first.` : L.brief}</p><small>TAP TO FIGHT ▶</small>`);
+  if (run === r) nextNote(r);
+}
+function nextNote(r) {
+  if (run !== r) return;
+  const qi = takeDue(r.queue, r.turn), base = qi >= 0 ? r.queue.splice(qi, 1)[0].n : draw(r.pool, r.lastMidi);
+  r.turn++; r.lastMidi = base.midi;
+  const n = r.n = { ...base, again: qi >= 0, isNew: !st.seen[base.key] && !st.m[base.key], tries: 0, wrong: undefined };
+  r.phase = 'read';
+  startFuse(r, n.isNew ? Infinity : r.read);
+  if (n.isNew) { glowWant(n.midi); coach(`${n.name} sits ${where(n)}${n.acc ? `, with a ${sym(n)}` : ''}. On the bells: ${barWhere(n)}. Hit the glowing bar.`, 'new'); }
+  renderNote(r, true); hud();
+}
+function startFuse(r, limit) {
+  const tok = ++r.tok;
+  r.limit = limit; r.t0 = r.lastFrame = performance.now();
+  $('#fuseBox').classList.toggle('second', r.phase === 'second');
+  const loop = () => {
+    if (run !== r || r.tok !== tok) return;
+    const now = performance.now(), gap = now - r.lastFrame;
+    r.lastFrame = now;
+    if (gap > 250 || rotated()) r.t0 += gap; // hidden tab, stall or portrait: hold the clock
+    const left = r.limit - (now - r.t0) / 1000;
+    $('#fuse').style.width = `${isFinite(left) ? Math.max(0, left / r.limit) * 100 : 100}%`;
+    if (left <= 0) return timeUp(r);
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+}
+function press(midi, ts = performance.now()) {
+  bell(midi); flash(BARS[midi], 'down', 110);
+  const r = run; if (!r || !['read', 'second', 'reveal'].includes(r.phase)) return;
+  const n = r.n;
+  if (r.phase === 'reveal') {
+    if (midi !== n.midi) return;
+    glowWant(-1); flash(BARS[midi], 'ok', 200); r.phase = 'next';
+    return setTimeout(() => nextNote(r), 150);
+  }
+  if (midi === n.midi) return correct(r, ts);
+  n.wrong = midi; flash(BARS[midi], 'bad', 260); setTimeout(buzz, 30);
+  if (n.isNew) { coach(`${explain(n, midi)} Hit the glowing bar.`, 'miss'); return renderNote(r); }
+  r.phase === 'read' ? firstMiss(r, explain(n, midi)) : reveal(r);
+}
+function correct(r, ts) {
+  const n = r.n, b = BARS[n.midi], rt = Math.max(0, (ts - r.t0) / 1000);
+  r.tok++; glowWant(-1); flash(b, 'ok', 200);
+  let dmg, label, color;
+  if (n.isNew) {
+    st.seen[n.key] = 1; [dmg, label, color] = [5, 'LEARNED', 'var(--gold)'];
+    coach(`${n.name}: ${where(n)}. Now it is in the fight.`, 'battle');
+  } else if (r.phase === 'second') {
+    [dmg, label, color] = [3, 'RECOVERED', 'var(--mute)'];
+    coach(`Yes, ${n.name}: ${where(n)}. It comes back soon.`, 'battle');
+  } else {
+    record(n.key, 1); r.hits++; r.notes++; r.times.push(rt);
+    let k; [label, k, color] = rt < 1 ? ['CRIT', 2, 'var(--gold)'] : rt < 2 ? ['GREAT', 1.5, 'var(--cyan)'] : ['GOOD', 1, 'var(--ink)'];
+    const before = mult(r.combo);
+    r.combo++; r.best = Math.max(r.best, r.combo); if (label === 'CRIT') r.crits++;
+    if (mult(r.combo) > before) { setTimeout(() => flash($('#mult'), 'pop', 300)); chord([77, 81, 84], .08, .12); }
+    if (r.combo % 5 === 0) { r.hp = Math.min(CONFIG.maxHp, r.hp + 2); label += ' +2 HP'; }
+    r.read = adapt(r.read, true, r.L.read);
+    dmg = Math.round(10 * k * mult(r.combo) * (st.noLabels ? 1.5 : 1));
+    coach(`${n.name} · ${where(n)} · ${rt.toFixed(1)}s`, 'battle');
+  }
+  r.score += dmg; judge(label, color); sparks(b, color);
+  r.phase = 'next'; hud();
+  if (!hurtFoe(r, dmg, color)) setTimeout(() => nextNote(r), 170);
+}
+function firstMiss(r, tip) {
+  const n = r.n;
+  r.tok++; record(n.key, 0); r.notes++; r.combo = 0;
+  r.read = adapt(r.read, false, r.L.read);
+  r.queue.push({ n: { ...n }, due: r.turn + 3 });
+  if (!r.missed.some(x => x.key === n.key)) r.missed.push({ ...n });
+  r.hp = Math.max(0, r.hp - r.foe.atk); r.hpLost += r.foe.atk;
+  flash($('#sprite'), 'lunge', 500); flash($('#play'), 'hurt', 360); thud(); judge(`MISS −${r.foe.atk} HP`, 'var(--pink)'); hud();
+  if (r.hp <= 0) return finish(r, false);
+  r.phase = 'second'; n.tries = 1;
+  coach(`${tip} Second chance!`, 'miss');
+  renderNote(r); startFuse(r, CONFIG.secondChance);
+}
+function timeUp(r) {
+  if (r.phase === 'read') return firstMiss(r, `Time! It sits ${where(r.n)}.`);
+  reveal(r);
+}
+function reveal(r) {
+  const n = r.n;
+  r.tok++; r.phase = 'reveal'; n.tries = 2;
+  glowWant(n.midi); renderNote(r); bell(n.midi, .2, .2); $('#fuse').style.width = '0%';
+  coach(`It was ${n.name}: ${where(n)}. On the bells: ${barWhere(n)}. Hit it to go on.`, 'miss');
+}
+function hurtFoe(r, dmg, color) {
+  const f = r.foe; f.hp = Math.max(0, f.hp - dmg); foeBar();
+  flash($('#sprite'), 'hit', 260);
+  const d = document.createElement('div'); d.className = 'dmg'; d.textContent = dmg; d.style.color = color;
+  $('#foe').append(d); setTimeout(() => d.remove(), 800);
+  if (f.hp > 0) return false;
+  foeDown(r);
+  return true;
+}
+async function foeDown(r) {
+  r.phase = 'down';
+  $('#sprite').className = `sprite${r.foe.crown ? ' boss' : ''} dead`; judge('DEFEATED', 'var(--gold)'); chord([70, 74, 77, 82, 86], .1, .2);
+  await sleep(950); if (run !== r) return;
+  if (r.L !== ENDLESS) return finish(r, true);
+  r.kills++; r.hp = Math.min(CONFIG.maxHp, r.hp + 5);
+  setFoe(r, r.kills); hud();
+  await tapOverlay(`${r.foe.name}<small>NEXT UP</small>`, 1300);
+  nextNote(r);
+}
+function hud() {
+  const r = run, m = mult(r.combo);
+  $('#hudKind').textContent = `${r.k < LEVELS.length ? `LEVEL ${r.k + 1}` : 'GAUNTLET'} · ${r.read.toFixed(1)}s TO READ`;
+  $('#score').textContent = fmt(r.score);
+  $('#comboN').textContent = r.combo >= 2 ? `${r.combo} STREAK` : '';
+  $('#mult').textContent = `×${m}`; $('#mult').className = `mult m${m}`;
+  $('#chart').className = `chart m${m}`;
+  $('#hpFill').style.width = `${r.hp / CONFIG.maxHp * 100}%`;
+  $('#hpTxt').textContent = `${r.hp}/${CONFIG.maxHp}`;
+}
+function judge(text, color) { const j = $('#judge'); j.textContent = text; j.style.color = color; j.classList.remove('on'); void j.offsetWidth; j.classList.add('on'); }
+async function finish(r, won) {
+  r.phase = 'over'; r.tok++; glowWant(-1);
+  if (!won) { judge('DOWN', 'var(--pink)'); await sleep(900); }
+  if (run !== r) return;
+  showResults(settle(r, won));
+}
+function settle(r, won) {
+  const today = dayStr(), isLevel = r.k < LEVELS.length, acc = r.notes ? r.hits / r.notes : 0;
+  const avg = r.times.length ? r.times.reduce((a, b) => a + b) / r.times.length : 0;
+  const rank = rankFor(isLevel ? { won, acc, hpLost: r.hpLost, dealt: 1 - r.foe.hp / r.foe.max } : { kills: r.kills });
+  const clearedNow = isLevel && won, firstClear = clearedNow && !st.clear[r.k];
+  if (clearedNow) st.clear[r.k] = true;
+  const prev = st.best[r.k], pb = !prev || r.score > prev.score, read = r.times.length >= 5 ? avg : 0;
+  st.best[r.k] = { rank: pb ? rank : prev.rank, score: pb ? r.score : prev.score, read: prev?.read && read ? Math.min(prev.read, read) : prev?.read || read };
+  if (st.day !== today) { st.day = today; st.today = { runs: 0, hits: 0, notes: 0, best: 0 }; }
+  const t = st.today; t.runs++; t.hits += r.hits; t.notes += r.notes; t.best = Math.max(t.best, r.score);
+  const dailyDone = t.runs === CONFIG.dailyRuns;
+  if (dailyDone) bumpStreak(st, today);
+  const before = lvlFor(st.xp), xp = Math.round(r.score / 10) + (won ? 60 : 0) + (firstClear ? 150 : 0) + (dailyDone ? 100 : 0);
+  st.xp += xp; save();
+  const mastered = masteredSet();
+  return { k: r.k, L: r.L, won, foe: r.foe, kills: r.kills, hits: r.hits, notes: r.notes, crits: r.crits, acc, avg, score: r.score, best: r.best, missed: r.missed,
+    rank, pb, clearedNow, firstClear, dailyDone, xp, lvl: lvlFor(st.xp), levelUp: lvlFor(st.xp) > before,
+    mastered: mastered.length, fresh: mastered.filter(m => !r.masteredBefore.includes(m)) };
+}
+
+/* ---------- results, daily drop, alerts ---------- */
+let last = null;
+function showResults(R) {
+  last = R;
+  show('results');
+  const endless = R.k >= LEVELS.length;
+  $('#rHead').textContent = endless ? `${R.kills} DOWN` : R.won ? 'VICTORY' : 'DOWN, NOT OUT';
+  $('#rHead').className = `rhead ${R.won || endless ? 'rS' : 'rD'}`;
+  $('#rTitle').textContent = endless ? 'Gauntlet' : `Level ${R.k + 1} · ${R.L.name} · vs ${R.foe.name}`;
+  const rank = $('#rank'); rank.textContent = R.rank; rank.className = `rank r${R.rank}`; void rank.offsetWidth; rank.classList.add('slam');
+  chord(R.rank === 'S' || R.rank === 'A' ? [70, 74, 77, 82] : [65, 69, 72]);
+  $('#pb').hidden = !(R.pb && R.score);
+  const tiles = [[`${Math.round(R.acc * 100)}%`, 'RIGHT FIRST TRY'], [R.avg ? `${R.avg.toFixed(1)}s` : '–', 'AVG READ TIME'], [R.best, 'BEST STREAK'], [R.crits, 'CRITS · UNDER 1S']];
+  $('#rStats').innerHTML = tiles.map(([v, l]) => `<div><b>${v}</b><small>${l}</small></div>`).join('');
+  const lines = [];
+  if (R.firstClear) lines.push(`<b>LEVEL CLEARED.</b> ${R.k + 1 < LEVELS.length ? `Level ${R.k + 2} unlocked: ${LEVELS[R.k + 1].name}.` : 'The Gauntlet is open.'}`);
+  else if (!R.won && !endless) lines.push(`${R.foe.name} had ${R.foe.hp} HP left. Run it back: your missed notes come first.`);
+  if (R.missed.length) lines.push(`Missed: ${R.missed.map(n => n.name).join(' ')}`);
+  if (R.fresh.length) lines.push(`<b>MASTERED:</b> ${R.fresh.map(barName).join(' ')}. Those letters are gone from the staff now.`);
+  if (R.levelUp) lines.push(`<b>LEVEL UP.</b> You are now LV ${R.lvl}: ${titleFor(R.lvl)}.`);
+  lines.push(`+${R.xp} XP · ${R.mastered}/32 bars mastered · today ${Math.min(st.today.runs, CONFIG.dailyRuns)}/${CONFIG.dailyRuns} battles`);
+  $('#banner').innerHTML = lines.join('<br>'); $('#banner').hidden = false;
+  $('#nextBtn').hidden = !R.clearedNow;
+  $('#raven').hidden = true; $('#prize').innerHTML = '';
+  const score = $('#rScore'), t0 = performance.now();
+  (function count() { const p = Math.min(1, (performance.now() - t0) / 600); score.textContent = fmt(R.score * p); if (p < 1) requestAnimationFrame(count); })();
+  if (R.dailyDone) {
+    const t = st.today, adv = t.hits / Math.max(1, t.notes) >= .9;
+    $('#drop').hidden = false; $('#rBtns').hidden = true; $('#rollBtn').hidden = false; $('#rollBtn').disabled = false;
+    $('#dropText').innerHTML = `<b>DAILY DONE.</b> 🔥 ${liveStreak()} day streak. Roll for a bar skin.${adv ? ' 90%+ right first try today = <b>ADVANTAGE</b>: roll 2, keep the best.' : ''}`;
+    $('#dice').innerHTML = '<div class="die">?</div>'.repeat(adv ? 2 : 1);
+    $('#rollBtn').onclick = () => rollDrop(R);
+  } else {
+    $('#drop').hidden = true; $('#rBtns').hidden = false;
+    if (R.firstClear) sendRaven(R, null);
+  }
+}
+async function rollDrop(R) {
+  $('#rollBtn').disabled = true;
+  const dice = [...$('#dice').children], vals = dice.map(() => 1 + Math.floor(Math.random() * 20));
+  dice.forEach(d => d.classList.add('rolling'));
+  for (let t = 0; t < 14; t++) { dice.forEach(d => { d.textContent = 1 + Math.floor(Math.random() * 20); }); tick(900 + Math.random() * 400); await sleep(50 + t * 6); }
+  dice.forEach((d, j) => { d.classList.remove('rolling'); d.textContent = vals[j]; });
+  const roll = Math.max(...vals);
+  if (dice.length > 1) dice[vals.indexOf(roll) ^ 1].classList.add('lose');
+  const rar = rarityFor(roll), id = pick(Object.keys(SKINS).filter(s => SKINS[s][1] === rar && !st.skins[s])) || null;
+  if (id) st.skins[id] = 1; else st.xp += 300;
+  save();
+  $('#rollBtn').hidden = true;
+  const [nm, , face] = id ? SKINS[id] : [];
+  $('#prize').innerHTML = id
+    ? `<div class="prize ${rar}"><i style="--face:${face}"></i><div><small>${rar.toUpperCase()}${roll === 20 ? ' · NAT 20' : ''}</small><b>${nm}</b><button class="ghost" id="equip">EQUIP</button></div></div>`
+    : `<div class="prize ${rar}"><div><small>${rar.toUpperCase()}</small><b>+300 XP</b>You own every ${rar} skin.</div></div>`;
+  if (id) $('#equip').onclick = () => { st.skin = id; save(); applyLook(); $('#equip').textContent = 'EQUIPPED ✓'; };
+  roll === 20 ? chord([72, 76, 79, 84], 0, .22) : roll === 1 ? buzz() : chord([77, 81]);
+  $('#rBtns').hidden = false;
+  sendRaven(R, { roll, rar, name: id ? `${nm} bars` : '+300 XP' });
+}
+async function ntfy(m) {
+  try { const r = await fetch('https://ntfy.sh', { method: 'POST', body: JSON.stringify({ topic: CONFIG.ntfyTopic, ...m }) }); return r.ok; }
+  catch { return false; }
+}
+let flushing = null;
+async function drain() { while (st.outbox.length) { if (!await ntfy(st.outbox[0])) return false; st.outbox.shift(); save(); } return true; }
+function flushOutbox() { if (!flushing) flushing = drain().finally(() => { flushing = null; }); return flushing; }
+async function sendRaven(R, drop) {
+  if (!CONFIG.ntfyTopic) return;
+  const who = CONFIG.grownup || 'your grown-up', t = st.today, s = liveStreak(), el = $('#raven');
+  const what = [R.firstClear && `beat ${R.foe.name} on Level ${R.k + 1}: ${R.L.name} (rank ${R.rank})`, R.dailyDone && "finished today's practice"].filter(Boolean).join(' and ');
+  const lines = [`This battle: ${R.hits}/${R.notes} right first try${R.avg ? ` · ${R.avg.toFixed(1)} s per note` : ''} · ${R.crits} under 1 s`];
+  if (R.missed.length) lines.push(`Missed: ${R.missed.map(n => n.name).join(' ')}`);
+  lines.push(`Notes mastered: ${R.mastered}/32${R.fresh.length ? ` (new: ${R.fresh.map(barName).join(' ')})` : ''}`);
+  if (R.dailyDone) lines.push(`Today: ${t.runs} battles · ${Math.round(t.hits / Math.max(1, t.notes) * 100)}% right first try`);
+  if (drop) lines.push(`Daily drop: rolled ${drop.roll} → ${drop.name} (${drop.rar})`);
+  if (R.levelUp) lines.push(`Player level ${R.lvl}: ${titleFor(R.lvl)}`);
+  if (s) lines.push(`Streak: ${s} day${s === 1 ? '' : 's'} 🔥`);
+  if (R.firstClear && R.L.ask) lines.push(`Ask: ${R.L.ask}`);
+  el.hidden = false; el.textContent = `Sending your result to ${who}...`;
+  st.outbox.push({ title: `${CONFIG.kid} ${what}!`, message: lines.join('\n'), tags: drop?.roll === 20 ? ['tada', 'star'] : ['tada'] });
+  save();
+  await flushing;
+  const ok = await flushOutbox();
+  el.textContent = ok ? `Sent to ${who} ✓` : 'No internet. It sends next time.';
+}
+
+/* ---------- home ---------- */
+function renderHome() {
+  const l = lvlFor(st.xp), lo = 75 * (l - 1) * l, hi = 75 * l * (l + 1), runs = runsToday(), nk = nextLevel();
+  $('#lvl').textContent = `LV ${l} · ${titleFor(l)} · ${fmt(st.xp - lo)}/${fmt(hi - lo)} XP`;
+  $('#xpFill').style.width = `${(st.xp - lo) / (hi - lo) * 100}%`;
+  $('#streak').textContent = liveStreak();
+  $('#dailyN').textContent = `${Math.min(runs, CONFIG.dailyRuns)}/${CONFIG.dailyRuns}`;
+  $('#playSub').textContent = nk < LEVELS.length ? `LEVEL ${nk + 1} · ${LEVELS[nk].name}` : 'THE GAUNTLET';
+  $('#daily').innerHTML = runs >= CONFIG.dailyRuns ? 'Daily done ✓ Anything now is bonus.' : `<b>${CONFIG.dailyRuns - runs} more battle${CONFIG.dailyRuns - runs === 1 ? '' : 's'}</b> today keeps the 🔥 going. About 1 minute each.`;
+  $('#noLabels').checked = st.noLabels;
+  $('#mini').innerHTML = kitHTML(true);
+  $('#mastCount').textContent = `${masteredSet().length}/32 mastered`;
+  const row = (k, L, open, sub) => {
+    const b = st.best[k];
+    return `<li><button class="lv${k === nk ? ' next' : ''}" data-k="${k}"${open ? '' : ' disabled'}><span class="n">${k < LEVELS.length ? String(k + 1).padStart(2, '0') : '∞'}</span><span class="nm">${open ? '' : '🔒 '}${L.name}<small>${b?.read ? `Best ${b.read.toFixed(1)}s per note · ` : ''}${sub}</small></span><span class="kind${L.boss ? ' boss' : ''}">${L.boss ? 'BOSS' : 'BATTLE'}</span><span class="rk ${b ? 'r' + b.rank : ''}">${b ? b.rank : ''}</span></button></li>`;
+  };
+  $('#levels').innerHTML = LEVELS.map((L, k) => (L.stage ? `<li class="stage">${L.stage}</li>` : '') + row(k, L, unlocked(k), `vs ${L.foe[1]}`)).join('')
+    + `<li class="stage">Endless</li>` + row(LEVELS.length, ENDLESS, nk === LEVELS.length, 'Monsters until you drop');
+  const ids = Object.keys(SKINS);
+  $('#skinCount').textContent = `${ids.filter(s => st.skins[s]).length}/${ids.length}`;
+  $('#skins').innerHTML = ids.map(s => {
+    const [nm, rar, face] = SKINS[s], own = st.skins[s];
+    return `<button class="skin ${rar}${st.skin === s ? ' on' : ''}" data-s="${s}"${own ? '' : ' disabled'} style="--face:${face}"><i></i>${own ? nm : '???'}<small>${rar.toUpperCase()}</small></button>`;
+  }).join('');
+}
+function show(id) {
+  ['home', 'play', 'results'].forEach(s => { $('#' + s).hidden = s !== id; });
+  if (id === 'home') renderHome();
+  scrollTo(0, 0);
+}
+
+/* ---------- wiring ---------- */
+document.querySelectorAll('.kid').forEach(e => { e.textContent = CONFIG.kid; });
+buildBells(); applyLook();
+$('#kit').addEventListener('pointerdown', e => { const b = e.target.closest('.bar'); if (b) { e.preventDefault(); press(+b.dataset.m, e.timeStamp); } });
+$('#kit').addEventListener('click', e => { const b = e.target.closest('.bar'); if (b && e.detail === 0) press(+b.dataset.m); });
+addEventListener('keydown', e => { if (e.key === 'Enter' && !$('#overlay').hidden) $('#overlay').onpointerdown?.(); });
+$('#playBtn').onclick = () => startLevel(nextLevel());
+$('#levels').onclick = e => { const b = e.target.closest('button'); if (b && !b.disabled) startLevel(+b.dataset.k); };
+$('#skins').onclick = e => { const b = e.target.closest('button'); if (b && !b.disabled) { st.skin = b.dataset.s; save(); applyLook(); renderHome(); } };
+$('#noLabels').onchange = e => { st.noLabels = e.target.checked; save(); applyLook(); };
+$('#quit').onclick = () => { if (run) run.tok++; run = null; show('home'); };
+$('#menuBtn').onclick = () => { run = null; show('home'); };
+$('#againBtn').onclick = () => startLevel(last.k, last.missed);
+$('#nextBtn').onclick = () => startLevel(nextLevel());
+$('#grownBtn').onclick = () => { $('#topic').textContent = CONFIG.ntfyTopic; $('#testOut').textContent = ''; $('#grown').showModal(); };
+$('#testRaven').onclick = async () => {
+  $('#testOut').textContent = 'Sending...';
+  const ok = await ntfy({ title: 'Overtone test', message: `Alerts for ${CONFIG.kid} will show up here.`, tags: ['bell'] });
+  $('#testOut').textContent = ok ? 'Sent ✓ Check your phone.' : 'Failed. Check the internet connection.';
+};
+$('#resetBtn').onclick = () => {
+  if (!confirm(`Erase all of ${CONFIG.kid}'s progress on this device?`)) return;
+  try { localStorage.removeItem(KEY); } catch {}
+  location.reload();
+};
+
+function selftest() {
+  const eq = (a, b, m) => { if (JSON.stringify(a) !== JSON.stringify(b)) throw new Error(`${m}: ${JSON.stringify(a)} != ${JSON.stringify(b)}`); };
+  eq(note('Bb4'), { key: 'Bb4', name: 'B♭', midi: 70, step: 4, acc: -1 }, 'parse');
+  eq(['F3', 'C4', 'E4', 'Bb4', 'C5', 'C6'].map(k => note(k).step), [-6, -2, 0, 4, 5, 12], 'staff steps');
+  eq([note('F3').midi, note('C6').midi, ALL.length, new Set(ALL.map(k => note(k).midi)).size, NATS.length], [LOW, HIGH, 45, 32, 19], '32 bars, 19 in front');
+  eq(hz(note('C5').midi).toFixed(1), '2093.0', 'third-space C sounds as C7');
+  eq(['F3', 'B3', 'D4', 'E4', 'F4', 'G4', 'B4', 'C5', 'F5', 'G5', 'A5', 'B5', 'C6'].map(k => where(note(k))), ['on ledger line 3 below the staff', 'under ledger line 1 below the staff', 'just under the staff', 'on the bottom line', 'in the 1st space', 'on the 2nd line', 'on the middle line', 'in the 3rd space', 'on the top line', 'just on top of the staff', 'on ledger line 1 above the staff', 'above ledger line 1 over the staff', 'on ledger line 2 above the staff'], 'where on the staff');
+  eq([barWhere(note('C5')), barWhere(note('F#4')), barWhere(note('Gb4'))], ['front row, the 2nd C from the left', 'back row, just right of the 2nd F from the left', 'back row, just left of the 2nd G from the left'], 'where on the bells');
+  eq(explain(note('C5'), 60), 'Right name, wrong octave. Look again: in the 3rd space.', 'octave mistake');
+  eq(explain(note('Bb4'), 71), 'Watch the ♭. It is a back-row bar.', 'missed flat');
+  eq(explain(note('B4'), 70), 'No ♭ on this note. It is a front-row bar.', 'extra flat');
+  eq(explain(note('D5'), 72), 'You hit C. This note is 1 step higher on the staff, so 1 letter to the right.', 'step mistake');
+  eq(['', '1', '1110', '1111', '11110111', '11111111', '1111111100'].map(mastery), [0, 1, 1, 2, 2, 3, 2], 'mastery and letter fade');
+  eq([adapt(5, true, [6, 2]), adapt(2.05, true, [6, 2]), adapt(5.5, false, [6, 2]), adapt(3, false, [6, 2])].map(x => +x.toFixed(2)), [4.7, 2, 6, 3.45], 'read time adapts inside the level range');
+  eq([takeDue([{ due: 9 }, { due: 4 }], 5), takeDue([{ due: 9 }], 5)], [1, -1], 'missed notes come back when due');
+  eq([0, 149, 150, 449, 450].map(lvlFor), [1, 1, 2, 2, 3], 'levels');
+  eq([0, 3, 4, 8, 12, 40].map(mult), [1, 1, 2, 3, 4, 4], 'multiplier');
+  eq([{ won: true, acc: 1, hpLost: 0 }, { won: true, acc: 1, hpLost: 2 }, { won: true, acc: .8 }, { won: false, dealt: .7 }, { won: false, dealt: .2 }, { kills: 4 }].map(rankFor), ['S', 'A', 'B', 'C', 'D', 'A'], 'rank');
+  eq([20, 19, 18, 17, 11, 10, 1].map(rarityFor), ['legendary', 'epic', 'epic', 'rare', 'rare', 'common', 'common'], 'rarity');
+  const s = { streak: 3, lastDay: '2026-11-05' };
+  bumpStreak(s, '2026-11-07'); eq(s.streak, 4, 'streak survives one skipped day');
+  bumpStreak(s, '2026-11-07'); eq(s.streak, 4, 'streak counts a day once');
+  bumpStreak(s, '2026-11-11'); eq(s.streak, 1, 'streak resets after two skipped days');
+  LEVELS.forEach((L, k) => (L.pool === 'all' ? ALL : L.pool.split(' ')).forEach(t => {
+    const n = note(t);
+    if (n.midi < LOW || n.midi > HIGH) throw new Error(`level ${k + 1}: ${n.key} is not on the kit`);
+  }));
+  return 'selftest ok';
+}
+if (location.hash === '#selftest') console.log(selftest());
+
+try { navigator.storage?.persist?.(); } catch {}
+show('home');
+if (st.outbox.length) flushOutbox();
+</script>
+</body>
+</html>
